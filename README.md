@@ -29,4 +29,14 @@ cmake --build .
 ./uring_server
 # or
 ./epoll_server
+# or
+./build/fileserver_iouring
+```
+### 4. test the server
+
+```bash
+./test_server.sh
+./quick_benchmark.sh
+./syscall_analysis.sh
+python visualize_results.py
 ```
