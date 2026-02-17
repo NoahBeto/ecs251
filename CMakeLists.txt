@@ -3,7 +3,12 @@ project(uring_server C)
 
 set(CMAKE_C_STANDARD 11)
 
-add_executable(epoll_server webserver_epoll.c websever.c websever.h)
+# liburing install path
+set(LIBURING_INCLUDE_DIR "$ENV{HOME}/.local/include")
+set(LIBURING_LIB_DIR "$ENV{HOME}/.local/lib64")
 
-add_executable(uring_server webserver_liburing.c websever.c websever.h)
-target_link_libraries(uring_server uring)
+# io_uring file server
+add_executable(fileserver_iouring fileserver_iouring.c fileserver.h)
+target_include_directories(fileserver_iouring PRIVATE ${LIBURING_INCLUDE_DIR})
+target_link_directories(fileserver_iouring PRIVATE ${LIBURING_LIB_DIR})
+target_link_libraries(fileserver_iouring uring)
