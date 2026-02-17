@@ -38,5 +38,5 @@ cmake --build .
 ./test_server.sh
 ./quick_benchmark.sh
 ./syscall_analysis.sh
-python visualize_results.py
+python visualize_iouring.py
 ```
