@@ -124,6 +124,34 @@ For deeper analysis of system call behavior:
 
 JMeter can be used with the provided `nginx.jmx` file to generate load and compare throughput and latency between the different servers.
 
+## Evaluation and Results
+
+At this stage, our evaluation focuses on the static file server using io_uring. These experiments are used to verify correctness and understand baseline performance before completing a direct comparison with the epoll-based implementation.
+
+### Concurrency and Throughput
+
+The figure below shows how throughput changes as the number of concurrent clients increases for the io_uring file server.
+
+![io_uring Concurrency and Throughput](evaluation/io_uring_concurrency_and_throughput.png)
+
+### Functionality Verification
+
+This figure shows results from basic functionality tests used to verify correct behavior of the io_uring file server under different request patterns.
+
+![io_uring Function Verification](evaluation/io_uring_function_verify.png)
+
+### System Call Distribution
+
+We measured the distribution of system calls to understand syscall behavior and overhead in the io_uring implementation.
+
+![io_uring System Call Distribution](evaluation/io_uring_system_call_distribution.png)
+
+### Notes
+
+A brief summary of the current evaluation results is available in: evaluation/summary.txt
+
+The epoll-based evaluation is currently in progress and will be added once testing is complete.
+
 ## Attribution
 
 The HTTP server implementations are derived from: https://github.com/chen622/uring-server
