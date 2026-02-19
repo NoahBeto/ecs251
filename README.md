@@ -2,19 +2,14 @@
 
 ## Overview
 
-This project compares Linux io_uring and epoll by measuring their
-performance in two different server workloads:
+This project compares Linux io_uring and epoll by measuring their performance in two different server workloads:
 
 1. An HTTP server (from the original project)
 2. A file server (added in this project)
 
-The original code comes from:
-https://github.com/chen622/uring-server
+The original code comes from: https://github.com/chen622/uring-server
 
-That project focuses on comparing io_uring and epoll using an HTTP
-workload. This repository builds on that work by adding a file server
-to study how both approaches behave when file I/O becomes the main
-performance bottleneck.
+That project focuses on comparing io_uring and epoll using an HTTP workload. This repository builds on that work by adding a file server to study how both approaches behave when file I/O becomes the main performance bottleneck.
 
 ## What Changed From the Original Project
 
@@ -27,8 +22,7 @@ This project adds:
 - A file server implemented using epoll
 - Benchmarking and analysis scripts for file-serving workloads
 
-The HTTP server code is reused for comparison purposes. The file server
-code and benchmarking additions are new.
+The HTTP server code is reused for comparison purposes. The file server code and benchmarking additions are new.
 
 ## Why a File Server?
 
@@ -38,8 +32,7 @@ A file server shifts the focus toward:
 - Disk I/O behavior
 - Interaction between file I/O and network I/O
 
-This makes it easier to observe where io_uring provides benefits over
-traditional epoll-based designs.
+This makes it easier to observe where io_uring provides benefits over traditional epoll-based designs.
 
 ## Code Layout
 - fileserver_iouring.c: File server using io_uring
@@ -142,13 +135,13 @@ This figure shows results from basic functionality tests used to verify correct 
 
 ### System Call Distribution
 
-We measured the distribution of system calls to understand syscall behavior and overhead in the io_uring implementation.
+Using `strace`, we measured the distribution of system calls to understand syscall behavior and overhead in the io_uring implementation.
 
 ![io_uring System Call Distribution](evaluation/io_uring_system_call_distribution.png)
 
 ### Notes
 
-A brief summary of the current evaluation results is available in: evaluation/summary.txt
+A brief summary of the current evaluation results is available [here](https://github.com/NoahBeto/ecs251/blob/main/evaluation/summary.txt)
 
 The epoll-based evaluation is currently in progress and will be added once testing is complete.
 
