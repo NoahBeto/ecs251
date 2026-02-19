@@ -1,0 +1,33 @@
+======================================================================
+io_uring File Server Performance Summary
+ECS 251 Final Project
+======================================================================
+
+THROUGHPUT (requests/sec) - 1KB file
+----------------------------------------------------------------------
+     10 concurrent:    13759.00 req/s
+     50 concurrent:    13587.64 req/s
+    100 concurrent:    13156.68 req/s
+    500 concurrent:    15561.73 req/s
+   1000 concurrent:    13711.10 req/s
+
+LATENCY (ms) - 100 concurrent connections
+----------------------------------------------------------------------
+       1KB file:        7.60 ms
+      10KB file:        7.64 ms
+     100KB file:       13.99 ms
+       1MB file:       97.48 ms
+
+SYSTEM CALLS (for 100 requests)
+----------------------------------------------------------------------
+  Total syscalls: 142
+  Per request:    1.4
+
+Top system calls:
+  total                      71 calls
+  openat                     16 calls
+  mmap                       12 calls
+  newfstatat                  5 calls
+  fstat                       5 calls
+
+======================================================================
