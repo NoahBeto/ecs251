@@ -79,14 +79,14 @@ void server_loop_epoll(int server_socket) {
         }
 
         for (int j = 0; j < nfds; ++j) {
-            if (events[j].data.fd == server_socket && events[j].events == EPOLLIN) { //接受新连接
+            if (events[j].data.fd == server_socket && events[j].events == EPOLLIN) {
                 if ((connFd = accept(server_socket, (struct sockaddr *) &client_addr, &client_addr_len)) < 0) {
                     perror("accept conn_fd failed");
                     exit(EXIT_FAILURE);
                 }
                 printf("accept:%d\n", connFd);
                 add_read_request(connFd, epoll_fd);
-            } else if (events[j].events == EPOLLIN) { //读取请求内容
+            } else if (events[j].events == EPOLLIN) {
                 char buffer[1024] = {'\0'};
                 int ret = recv(events[j].data.fd, buffer, 1024, 0);
                 if (ret > 0) {
@@ -97,14 +97,10 @@ void server_loop_epoll(int server_socket) {
                     handle_client_request(req, epoll_fd);
                     free(req);
                 }
-                //发生错误
                 if (ret == -1) {
-                    //EAGAIN/EWOULDBLOCK提示你的应用程序现在没有数据可读请稍后再试
-                    //EINTR指操作被中断唤醒，需要重新读
                     if ((errno == EAGAIN) || (errno == EWOULDBLOCK ||errno == EINTR)) {
                         continue;
                     }
-                    //异常断开情况
                     else {
                         epoll_ctl(epoll_fd,EPOLL_CTL_DEL,events[j].data.fd,&events[j]);
                         close(events[j].data.fd);
@@ -112,7 +108,6 @@ void server_loop_epoll(int server_socket) {
                         break;
                     }
                 }
-                //接收到主动关闭请求
                 if (ret == 0) {
                     epoll_ctl(epoll_fd,EPOLL_CTL_DEL,events[j].data.fd,&events[j]);
                     close(events[j].data.fd);
