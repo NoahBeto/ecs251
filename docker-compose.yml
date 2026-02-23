@@ -1,0 +1,13 @@
+services:
+  dev:
+    image: ubuntu:latest
+    security_opt:
+      - seccomp:unconfined
+    volumes:
+      - .:/src
+    working_dir: /src
+    ports:
+      - "8000:8000"   # map container port 8000 to host
+    stdin_open: true
+    tty: true
+    command: bash

@@ -94,7 +94,7 @@ void server_loop_epoll(int server_socket) {
                     char path[128] = {0}, full_path[256] = {0};
                     sscanf(buffer, "GET %s ", path); // 提取路径
                     if (strcmp(path, "/") == 0) strcpy(path, "/index.html");
-                    snprintf(full_path, sizeof(full_path), "./public%s", path);
+                    snprintf(full_path, sizeof(full_path), "../public%s", path);
 
                     FILE *f = fopen(full_path, "rb");
                     if (f) {
@@ -154,6 +154,7 @@ void server_loop_epoll(int server_socket) {
         }
     }
 }
+
 
 int main() {
     type = 1;
