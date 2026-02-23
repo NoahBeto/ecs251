@@ -48,12 +48,41 @@ This makes it easier to observe where io_uring provides benefits over traditiona
 - gcc
 - liburing
 - JMeter (only required for benchmarking)
+- Docker Desktop (for Mac support)
 
 To install liburing on Ubuntu:
 
 ```bash
 sudo apt install liburing-dev
 ```
+### Special Mac Instructions (TODO)
+For Mac, open docker in the terminal, running the following command to enter ubuntu:
+```bash
+docker run --rm -it \
+  --security-opt seccomp=unconfined \
+  -v "$(pwd)":/src \
+  -w /src \
+  ubuntu:latest
+```
+and then
+```bash
+docker compose run dev
+``` 
+to make use of the yml configuration.
+
+```bash
+apt update && apt install -y liburing-dev build-essential gcc
+gcc -o fileserver_epoll fileserver_epoll.c websever.c -luring
+cd build
+../fileserver_epoll
+```
+
+and to run after the container has been built, run
+```bash
+docker compose up -d
+docker compose exec dev bash
+```
+
 
 ## Building the Servers
 
