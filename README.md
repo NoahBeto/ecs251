@@ -150,27 +150,23 @@ JMeter can be used with the provided `nginx.jmx` file to generate load and compa
 
 At this stage, our evaluation focuses on the static file server using io_uring. These experiments are used to verify correctness and understand baseline performance before completing a direct comparison with the epoll-based implementation.
 
-### Concurrency and Throughput
-
-The figure below shows how throughput changes as the number of concurrent clients increases for the io_uring file server.
-
-![io_uring Concurrency and Throughput](evaluation/io_uring_concurrency_and_throughput.png)
-
 ### Functionality Verification
 
 This figure shows results from basic functionality tests used to verify correct behavior of the io_uring file server under different request patterns.
 
 ![io_uring Function Verification](evaluation/io_uring_function_verify.png)
 
-### System Call Distribution
+### Performance and System Analysis
 
-Using `strace`, we measured the distribution of system calls to understand syscall behavior and overhead in the io_uring implementation.
+This figure shows how the io_uring file server performed during testing. The top left graph shows throughput as the number of concurrent connections increases. Performance improves at first, then drops once the load becomes too high. The top right graph shows latency for different file sizes. Smaller files are handled quickly, but latency increases as file size grows.
 
-![io_uring System Call Distribution](evaluation/io_uring_system_call_distribution.png)
+The bottom left graph shows CPU usage steadily rising as more connections are added. The bottom right chart lists the system calls used most often during testing, with openat and mmap appearing the most, followed by others like fstat and close.
+
+![io_uring evaluation results](evaluation/io_uring_evaluation_summary.png)
 
 ### Notes
 
-A brief summary of the current evaluation results is available [here](https://github.com/NoahBeto/ecs251/blob/main/evaluation/summary.txt)
+A brief summary of the current evaluation results is available [here](https://github.com/NoahBeto/ecs251/blob/main/evaluation/io_uring_summary.txt)
 
 The epoll-based evaluation is currently in progress and will be added once testing is complete.
 
