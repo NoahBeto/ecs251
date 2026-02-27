@@ -107,7 +107,7 @@ echo ""
 
 # --- Test 5: System Calls Analysis ---
 echo "=== Test 5: System Call Analysis ==="
-strace -c -f -o ${OUTPUT_DIR}/syscalls_detailed.txt ./build/fileserver_epoll 8000 &
+timeout --signal=INT 5s strace -c -f -o ${OUTPUT_DIR}/syscalls_detailed.txt ./build/fileserver_epoll 8000 >/dev/null 2>&1 &
 SERVER_PID=$!
 sleep 2
 ab -n 1000 -c 100 -q http://localhost:8000/test_data/1kb.txt >/dev/null 2>&1
