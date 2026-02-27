@@ -117,6 +117,7 @@ struct request {
     off_t upload_size;
     off_t upload_received;
     char *upload_buffer;
+    int upload_fd;  
     
     // HTTP request parsing
     char method[16];
