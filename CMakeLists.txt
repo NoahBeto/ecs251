@@ -12,3 +12,7 @@ add_executable(fileserver_iouring fileserver_iouring.c fileserver.h)
 target_include_directories(fileserver_iouring PRIVATE ${LIBURING_INCLUDE_DIR})
 target_link_directories(fileserver_iouring PRIVATE ${LIBURING_LIB_DIR})
 target_link_libraries(fileserver_iouring uring)
+
+#epoll file server
+add_executable(fileserver_epoll fileserver_epoll.c)
+target_link_libraries(fileserver_epoll pthread)
