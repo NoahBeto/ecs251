@@ -160,9 +160,25 @@ void server_loop_epoll(int server_socket) {
                 ssize_t n = recv(req->client_socket, buf, sizeof(buf), 0);
                 if (n <= 0) goto close_conn;
 
-                // 解析方法和路径
-                if (sscanf(buf, "%s /%s", req->method, req->filepath) < 2) strcpy(req->filepath, "index.html");
-                char *space = strchr(req->filepath, ' '); if (space) *space = '\0';
+                // 1. Better Parsing: Extract method and raw URL separately
+                char raw_url[MAX_PATH_LEN] = {0};
+                // buf looks like: "GET /index.html HTTP/1.1"
+                if (sscanf(buf, "%s %s", req->method, raw_url) < 2) {
+                    // Fallback if the request is malformed
+                    snprintf(req->filepath, MAX_PATH_LEN, "../public/index.html");
+                } else {
+                    // 2. Map the URL to the physical location shown in your screenshot
+                    if (strcmp(raw_url, "/") == 0) {
+                        snprintf(req->filepath, MAX_PATH_LEN, "../public/index.html");
+                    } else {
+                        // Prepend ../public/ to whatever they asked for
+                        // Example: /tux.png becomes ../public/tux.png
+                        snprintf(req->filepath, MAX_PATH_LEN, "../public%s", raw_url);
+                    }
+                }
+
+                // 3. LOGGING: This is vital. Add this to see what's happening!
+                printf("[%s] %s %s -> Local: %s\n", get_date_string(), req->method, raw_url, req->filepath);
 
                 // POST/PUT 上传
                 if (strcasecmp(req->method, "POST") == 0 || strcasecmp(req->method, "PUT") == 0) {

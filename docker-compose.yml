@@ -1,13 +1,14 @@
 services:
   dev:
-    image: ubuntu:latest
+    build: .
     security_opt:
       - seccomp:unconfined
     volumes:
       - .:/src
     working_dir: /src
     ports:
-      - "8000:8000"   # map container port 8000 to host
-    stdin_open: true
-    tty: true
+      - "8000:8000"
+    stdin_open: true # Keeps the standard input open
+    tty: true        # Keeps the terminal session "alive"
+    # Option A: Just use bash (manually run cmake/make once inside)
     command: bash

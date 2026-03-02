@@ -70,12 +70,14 @@ docker compose run dev
 ``` 
 to make use of the yml configuration.
 
-```bash
+<!-- ```bash
 apt update && apt install -y liburing-dev build-essential gcc
+apt-get update
+apt-get install -y build-essential cmake
 gcc -o fileserver_epoll fileserver_epoll.c websever.c -luring
 cd build
 ../fileserver_epoll
-```
+``` -->
 
 and to run after the container has been built, run
 ```bash
