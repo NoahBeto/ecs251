@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Comprehensive visualization for io_uring file server
+Comprehensive visualization for epoll file server
 Matches ECS 251 evaluation plan requirements
 """
 
@@ -11,8 +11,10 @@ import os
 from pathlib import Path
 
 class ComprehensiveVisualizer:
-    def __init__(self, results_dir='benchmark_results'):
+    def __init__(self, results_dir='benchmark_results_epoll_1KB'):
         self.results_dir = results_dir
+
+        Path(self.results_dir).mkdir(parents=True, exist_ok=True)
         
         # Data storage
         self.throughput = {}  # concurrency -> req/s
@@ -44,7 +46,7 @@ class ComprehensiveVisualizer:
         if match:
             result['transfer'] = float(match.group(1))
             
-        match = re.search(r'CPU Usage: ([\d.]+)%', content)
+        match = re.search(r'Peak CPU:\s*([\d.]+)%', content)
         if match:
             result['cpu'] = float(match.group(1))
             
@@ -54,19 +56,19 @@ class ComprehensiveVisualizer:
         """Load all benchmark data"""
         print("Loading data...")
         
-        # Throughput vs concurrency
+        # Throughput vs concurrency (1KB file)
         for c in [10, 50, 100, 500, 1000, 5000, 10000]:
-            data = self.parse_ab(f"{self.results_dir}/iouring_c{c}_1kb.txt")
+            data = self.parse_ab(f"{self.results_dir}/epoll_c{c}_1kb.txt")
             if 'rps' in data:
                 self.throughput[c] = data['rps']
                 if 'cpu' in data:
                     self.cpu_util[c] = data['cpu']
         
-        # Latency vs file size
-        files = {'1kb.txt': 1, '10kb.bin': 10, '100kb.bin': 100, 
-                 '1mb.bin': 1024, '10mb.bin': 10240}
+        # Latency vs file size - ALL .txt
+        files = {'1kb.txt': 1, '10kb.txt': 10, '100kb.txt': 100, 
+                 '1mb.txt': 1024, '10mb.txt': 10240}
         for fname, size in files.items():
-            data = self.parse_ab(f"{self.results_dir}/iouring_c100_{fname}")
+            data = self.parse_ab(f"{self.results_dir}/epoll_c500_{fname}")
             if 'latency' in data:
                 self.latency_filesize[size] = data['latency']
         
@@ -131,7 +133,7 @@ class ComprehensiveVisualizer:
         thru = [self.throughput[c] for c in conc]
         
         ax.plot(conc, thru, 'o-', linewidth=2.5, markersize=10, 
-                color='#2E86AB', label='io_uring')
+                color='#FF6F61', label='epoll')
         
         # Add value labels
         for x, y in zip(conc, thru):
@@ -139,7 +141,7 @@ class ComprehensiveVisualizer:
         
         ax.set_xlabel('Concurrent Connections', fontsize=13, fontweight='bold')
         ax.set_ylabel('Throughput (req/s)', fontsize=13, fontweight='bold')
-        ax.set_title('Throughput vs Concurrency (10 to 10,000 clients)\n1KB File', 
+        ax.set_title('Throughput vs Concurrency (10 to 10,000 clients)\n1KB File - epoll', 
                     fontsize=15, fontweight='bold', pad=20)
         ax.grid(True, alpha=0.3, linestyle='--')
         ax.set_xscale('log')
@@ -161,14 +163,14 @@ class ComprehensiveVisualizer:
         lats = [self.latency_filesize[s] for s in sizes]
         
         ax.plot(sizes, lats, 'o-', linewidth=2.5, markersize=10,
-                color='#A23B72', label='io_uring')
+                color='#FF6F61', label='epoll')
         
         for x, y in zip(sizes, lats):
             ax.text(x, y * 1.05, f'{y:.2f}', ha='center', fontsize=9)
         
         ax.set_xlabel('File Size (KB)', fontsize=13, fontweight='bold')
         ax.set_ylabel('Average Latency (ms)', fontsize=13, fontweight='bold')
-        ax.set_title('Latency vs File Size (1KB to 10MB)\n100 Concurrent Connections',
+        ax.set_title('Latency vs File Size (1KB to 10MB)\n100 Concurrent Connections - epoll',
                     fontsize=15, fontweight='bold', pad=20)
         ax.grid(True, alpha=0.3, linestyle='--')
         ax.set_xscale('log')
@@ -197,7 +199,7 @@ class ComprehensiveVisualizer:
         
         ax.set_xlabel('Concurrent Connections', fontsize=13, fontweight='bold')
         ax.set_ylabel('CPU Utilization (%)', fontsize=13, fontweight='bold')
-        ax.set_title('CPU Utilization vs Concurrency',
+        ax.set_title('CPU Utilization vs Concurrency - epoll',
                     fontsize=15, fontweight='bold', pad=20)
         ax.grid(True, alpha=0.3, linestyle='--')
         ax.set_xscale('log')
@@ -230,7 +232,7 @@ class ComprehensiveVisualizer:
         total = sum(self.syscalls.values())
         ax.set_xlabel('Number of Calls', fontsize=13, fontweight='bold')
         ax.set_ylabel('System Call', fontsize=13, fontweight='bold')
-        ax.set_title(f'System Call Distribution (Total: {total} calls)\n1000 Requests',
+        ax.set_title(f'System Call Distribution (Total: {total} calls)\n1000 Requests - epoll',
                     fontsize=15, fontweight='bold', pad=20)
         ax.grid(True, alpha=0.3, axis='x', linestyle='--')
         
@@ -248,7 +250,7 @@ class ComprehensiveVisualizer:
         if self.throughput:
             conc = sorted(self.throughput.keys())
             thru = [self.throughput[c] for c in conc]
-            ax1.plot(conc, thru, 'o-', linewidth=2, markersize=8, color='#2E86AB')
+            ax1.plot(conc, thru, 'o-', linewidth=2, markersize=8, color='#FF6F61')
             ax1.set_xlabel('Concurrent Connections', fontweight='bold')
             ax1.set_ylabel('Throughput (req/s)', fontweight='bold')
             ax1.set_title('Throughput vs Concurrency', fontweight='bold')
@@ -260,7 +262,7 @@ class ComprehensiveVisualizer:
         if self.latency_filesize:
             sizes = sorted(self.latency_filesize.keys())
             lats = [self.latency_filesize[s] for s in sizes]
-            ax2.plot(sizes, lats, 'o-', linewidth=2, markersize=8, color='#A23B72')
+            ax2.plot(sizes, lats, 'o-', linewidth=2, markersize=8, color='#FF6F61')
             ax2.set_xlabel('File Size (KB)', fontweight='bold')
             ax2.set_ylabel('Latency (ms)', fontweight='bold')
             ax2.set_title('Latency vs File Size', fontweight='bold')
@@ -293,7 +295,7 @@ class ComprehensiveVisualizer:
             ax4.tick_params(axis='x', rotation=45)
             ax4.grid(True, alpha=0.3, axis='y')
         
-        fig.suptitle('io_uring File Server Performance Analysis', 
+        fig.suptitle('epoll File Server Performance Analysis', 
                      fontsize=16, fontweight='bold', y=0.995)
         plt.tight_layout()
         plt.savefig(f'{self.results_dir}/evaluation_summary.png', dpi=300)
@@ -306,7 +308,7 @@ class ComprehensiveVisualizer:
         
         with open(report_path, 'w') as f:
             f.write("=" * 80 + "\n")
-            f.write("io_uring File Server - Evaluation Report\n")
+            f.write("epoll File Server - Evaluation Report\n")
             f.write("ECS 251 Operating Systems Final Project\n")
             f.write("=" * 80 + "\n\n")
             
