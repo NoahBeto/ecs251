@@ -281,4 +281,5 @@ done
 echo "========================================"
 echo "Benchmark Complete!"
 echo "Results in ${OUTPUT_DIR}/"
+echo "Run: python3 visualize_results_epoll_10MB.py to generate graphs"
 echo "========================================"
