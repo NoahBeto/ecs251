@@ -214,32 +214,64 @@ class ComprehensiveVisualizer:
         """System calls distribution"""
         if not self.syscalls:
             return
-            
-        top = sorted(self.syscalls.items(), key=lambda x: x[1], reverse=True)[:10]
-        
+
+        top = sorted(self.syscalls.items(), key=lambda x: x[1], reverse=True)[:6]
+
         fig, ax = plt.subplots(figsize=(12, 7))
-        
+
         names = [s[0] for s in top]
         counts = [s[1] for s in top]
-        
-        bars = ax.barh(names, counts, color='#C73E1D', alpha=0.8)
-        
+
+        bars = ax.bar(names, counts, color='#C73E1D', alpha=0.8, width=0.6)
+
         for bar, count in zip(bars, counts):
-            width = bar.get_width()
-            ax.text(width * 1.02, bar.get_y() + bar.get_height()/2,
-                   f'{count}', ha='left', va='center', fontsize=10, fontweight='bold')
-        
+            ax.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 30,
+                    f'{count}', ha='center', va='bottom', fontsize=13, fontweight='bold')
+
         total = sum(self.syscalls.values())
-        ax.set_xlabel('Number of Calls', fontsize=13, fontweight='bold')
-        ax.set_ylabel('System Call', fontsize=13, fontweight='bold')
-        ax.set_title(f'System Call Distribution (Total: {total} calls)\n1000 Requests - epoll',
+        ax.set_xlabel('System Call', fontsize=14, fontweight='bold')
+        ax.set_ylabel('Number of Calls', fontsize=14, fontweight='bold')
+        ax.set_title(f'Top System Calls (Total: {total})\n1000 Requests - epoll',
                     fontsize=15, fontweight='bold', pad=20)
-        ax.grid(True, alpha=0.3, axis='x', linestyle='--')
-        
+        ax.tick_params(axis='x', labelsize=13)
+        ax.tick_params(axis='y', labelsize=12)
+        ax.grid(True, alpha=0.3, axis='y', linestyle='--')
+
         plt.tight_layout()
         plt.savefig(f'{self.results_dir}/syscalls_distribution.png', dpi=300)
         print(f"✓ Saved: syscalls_distribution.png")
         plt.close()
+
+    # def plot_syscalls(self):
+    #     """System calls distribution"""
+    #     if not self.syscalls:
+    #         return
+            
+    #     top = sorted(self.syscalls.items(), key=lambda x: x[1], reverse=True)[:10]
+        
+    #     fig, ax = plt.subplots(figsize=(12, 7))
+        
+    #     names = [s[0] for s in top]
+    #     counts = [s[1] for s in top]
+        
+    #     bars = ax.barh(names, counts, color='#C73E1D', alpha=0.8)
+        
+    #     for bar, count in zip(bars, counts):
+    #         width = bar.get_width()
+    #         ax.text(width * 1.02, bar.get_y() + bar.get_height()/2,
+    #                f'{count}', ha='left', va='center', fontsize=10, fontweight='bold')
+        
+    #     total = sum(self.syscalls.values())
+    #     ax.set_xlabel('Number of Calls', fontsize=13, fontweight='bold')
+    #     ax.set_ylabel('System Call', fontsize=13, fontweight='bold')
+    #     ax.set_title(f'System Call Distribution (Total: {total} calls)\n1000 Requests - epoll',
+    #                 fontsize=15, fontweight='bold', pad=20)
+    #     ax.grid(True, alpha=0.3, axis='x', linestyle='--')
+        
+    #     plt.tight_layout()
+    #     plt.savefig(f'{self.results_dir}/syscalls_distribution.png', dpi=300)
+    #     print(f"✓ Saved: syscalls_distribution.png")
+    #     plt.close()
     
     def plot_comparison_grid(self):
         """4-panel comparison matching evaluation plan"""
@@ -292,7 +324,8 @@ class ComprehensiveVisualizer:
             ax4.set_xlabel('System Call', fontweight='bold')
             ax4.set_ylabel('Count', fontweight='bold')
             ax4.set_title(f'Top System Calls ({total} total)', fontweight='bold')
-            ax4.tick_params(axis='x', rotation=45)
+            # ax4.tick_params(axis='x', rotation=45)
+            ax4.tick_params(axis='x', rotation=0, labelsize=12)
             ax4.grid(True, alpha=0.3, axis='y')
         
         fig.suptitle('epoll File Server Performance Analysis', 

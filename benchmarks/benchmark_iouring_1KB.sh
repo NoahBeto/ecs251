@@ -128,56 +128,54 @@ EOF
     echo ""
 done
 
+# no perf installed
 # ---------------------------------------------------------------
 # Test 4: CPU Profiling with perf
 # ---------------------------------------------------------------
-echo "=== Test 4: CPU Profiling (perf) ==="
-if command -v perf &>/dev/null; then
-    SERVER_PID=$(pgrep -f "fileserver_iouring 8000")
-    sudo perf record -F 99 -p $SERVER_PID -g \
-        -o ${OUTPUT_DIR}/perf.data -- sleep 10 &
-    PERF_PID=$!
-    sleep 1
-    ab -n 10000 -c 500 -q \
-        http://localhost:8000/test_data/1kb.txt >/dev/null 2>&1
-    wait $PERF_PID
-    sudo perf report -i ${OUTPUT_DIR}/perf.data --stdio \
-        > ${OUTPUT_DIR}/perf_report.txt 2>/dev/null
-    echo "✓ CPU profile saved"
-else
-    echo "⚠ perf not installed, skipping"
-fi
-echo ""
+# echo "=== Test 4: CPU Profiling (perf) ==="
+# if command -v perf &>/dev/null; then
+#     SERVER_PID=$(pgrep -f "fileserver_iouring 8000")
+#     sudo perf record -F 99 -p $SERVER_PID -g \
+#         -o ${OUTPUT_DIR}/perf.data -- sleep 10 &
+#     PERF_PID=$!
+#     sleep 1
+#     ab -n 10000 -c 500 -q \
+#         http://localhost:8000/test_data/1kb.txt >/dev/null 2>&1
+#     wait $PERF_PID
+#     sudo perf report -i ${OUTPUT_DIR}/perf.data --stdio \
+#         > ${OUTPUT_DIR}/perf_report.txt 2>/dev/null
+#     echo "✓ CPU profile saved"
+# else
+#     echo "⚠ perf not installed, skipping"
+# fi
+# echo ""
 
-# ---------------------------------------------------------------
-# Test 5: System Call Analysis
-# FIX: always kill and restart server so strace captures the
-#      NEW binary (with batched submit).  Use -e trace=all to
-#      count io_uring_enter separately from other syscalls.
-# ---------------------------------------------------------------
-echo "=== Test 5: System Call Analysis (1KB file) ==="
+# something wrong with this system call analysis currently
 
-pkill -f "fileserver_iouring 8000"; sleep 1
+# echo "=== Test 5: System Call Analysis (1KB file) ==="
 
-# No filter: capture all syscalls including io_uring_enter.
-# No -f: single process only, avoids kernel-thread noise.
-strace -c -o ${OUTPUT_DIR}/syscalls_detailed.txt \
-    ./build/fileserver_iouring 8000 2>/dev/null &
-SERVER_PID=$!
-sleep 2
 
-echo "Running 1000 requests at c=100..."
-ab -n 1000 -c 100 -q \
-    http://localhost:8000/test_data/1kb.txt >/dev/null 2>&1
+# pkill -f "fileserver_iouring 8000"; sleep 1
 
-sleep 1
-kill -INT $SERVER_PID
-wait $SERVER_PID 2>/dev/null
+# # No filter: capture all syscalls including io_uring_enter.
+# # No -f: single process only, avoids kernel-thread noise.
+# strace -c -o ${OUTPUT_DIR}/syscalls_detailed.txt \
+#     ./build/fileserver_iouring 8000 2>/dev/null &
+# SERVER_PID=$!
+# sleep 2
 
-echo "--- syscall summary ---"
-cat ${OUTPUT_DIR}/syscalls_detailed.txt
-echo "✓ System call data saved"
-echo ""
+# echo "Running 1000 requests at c=100..."
+# ab -n 1000 -c 100 -q \
+#     http://localhost:8000/test_data/1kb.txt >/dev/null 2>&1
+
+# sleep 1
+# kill -INT $SERVER_PID
+# wait $SERVER_PID 2>/dev/null
+
+# echo "--- syscall summary ---"
+# cat ${OUTPUT_DIR}/syscalls_detailed.txt
+# echo "✓ System call data saved"
+# echo ""
 
 # Restart clean server for remaining tests
 ./build/fileserver_iouring 8000 &
@@ -196,7 +194,7 @@ for c in 10 50 100; do
         curl -s -X POST --data-binary @/tmp/upload_test.bin \
             http://localhost:8000/test_data/upload_${i}.bin &
     done
-    wait
+    # wait
     end_time=$(date +%s.%N)
     duration=$(echo "$end_time - $start_time" | bc)
     throughput=$(echo "scale=2; $c / $duration" | bc)

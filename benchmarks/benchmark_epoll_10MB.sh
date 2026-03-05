@@ -68,21 +68,21 @@ for c in 10 50 100 500 1000 5000 10000; do
 
     # Each connection handles at least 20 requests (amortises TCP setup).
     # Cap at 50000 to keep each concurrency level under ~30s.
-    n_requests=$((c / 2))
-    [ $n_requests -lt 200 ] && n_requests=200
-    [ $n_requests -gt 2000 ] && n_requests=2000
+    n_requests=$((c * 20))
+    [ $n_requests -lt 20000 ] && n_requests=20000
+    [ $n_requests -gt 50000 ] && n_requests=50000
     timeout=120
 
     echo "  Sending $n_requests requests at c=$c"
 
     ab -n $n_requests -c $c -s $timeout -k \
         -q http://localhost:8000/test_data/10mb.txt \
-        2>&1 > "${OUTPUT_DIR}/epoll_c${c}_1mb.txt"
+        2>&1 > "${OUTPUT_DIR}/epoll_c${c}_10mb.txt"
     AB_EXIT=$?
 
     if [ $AB_EXIT -eq 0 ]; then
         grep -E "Requests per second|Time per request|Failed requests" \
-            "${OUTPUT_DIR}/epoll_c${c}_1mb.txt"
+            "${OUTPUT_DIR}/epoll_c${c}_10mb.txt"
     else
         echo "  Benchmark failed (exit $AB_EXIT)"
     fi
@@ -121,7 +121,7 @@ EOF
                  | grep -E "Requests/sec|Latency"
     else
         ab -n 1000 -c $c -H "Range: bytes=0-1023" \
-            http://localhost:8000/test_data/10mb.txt \
+            http://localhost:8000/test_data/1mb.txt \
             2>&1 | tee "${OUTPUT_DIR}/range_c${c}.txt" \
                  | grep -E "Requests per second|Time per request"
     fi
@@ -131,23 +131,23 @@ done
 # ---------------------------------------------------------------
 # Test 4: CPU Profiling with perf
 # ---------------------------------------------------------------
-echo "=== Test 4: CPU Profiling (perf) ==="
-if command -v perf &>/dev/null; then
-    SERVER_PID=$(pgrep -f "fileserver_epoll 8000")
-    sudo perf record -F 99 -p $SERVER_PID -g \
-        -o ${OUTPUT_DIR}/perf.data -- sleep 10 &
-    PERF_PID=$!
-    sleep 1
-    ab -n 10000 -c 500 -q \
-        http://localhost:8000/test_data/10mb.txt >/dev/null 2>&1
-    wait $PERF_PID
-    sudo perf report -i ${OUTPUT_DIR}/perf.data --stdio \
-        > ${OUTPUT_DIR}/perf_report.txt 2>/dev/null
-    echo "✓ CPU profile saved"
-else
-    echo "⚠ perf not installed, skipping"
-fi
-echo ""
+# echo "=== Test 4: CPU Profiling (perf) ==="
+# if command -v perf &>/dev/null; then
+#     SERVER_PID=$(pgrep -f "fileserver_epoll 8000")
+#     sudo perf record -F 99 -p $SERVER_PID -g \
+#         -o ${OUTPUT_DIR}/perf.data -- sleep 10 &
+#     PERF_PID=$!
+#     sleep 1
+#     ab -n 10000 -c 500 -q \
+#         http://localhost:8000/test_data/10mb.txt >/dev/null 2>&1
+#     wait $PERF_PID
+#     sudo perf report -i ${OUTPUT_DIR}/perf.data --stdio \
+#         > ${OUTPUT_DIR}/perf_report.txt 2>/dev/null
+#     echo "✓ CPU profile saved"
+# else
+#     echo "⚠ perf not installed, skipping"
+# fi
+# echo ""
 
 # ---------------------------------------------------------------
 # Test 5: System Call Analysis
@@ -157,27 +157,28 @@ echo ""
 # ---------------------------------------------------------------
 echo "=== Test 5: System Call Analysis (10MB file) ==="
 
-pkill -f "fileserver_epoll 8000"; sleep 1
+# --- epoll: use strace attach ---
+EPOLL_PID=$(pgrep -f "fileserver_epoll")
+if [ -z "$EPOLL_PID" ]; then
+    echo "Error: epoll server not running"; 
+else
+    echo 0 | sudo tee /proc/sys/kernel/yama/ptrace_scope >/dev/null
 
-# No filter: capture all syscalls including io_uring_enter.
-# No -f: single process only, avoids kernel-thread noise.
-strace -c -o ${OUTPUT_DIR}/syscalls_detailed.txt \
-    ./build/fileserver_epoll 8000 2>/dev/null &
-SERVER_PID=$!
-sleep 2
+    sudo strace -c -p $EPOLL_PID \
+        -o ${OUTPUT_DIR}/syscalls_detailed.txt &
+    STRACE_PID=$!
+    sleep 2
 
-echo "Running 1000 requests at c=100..."
-ab -n 1000 -c 100 -q \
-    http://localhost:8000/test_data/10mb.txt >/dev/null 2>&1
+    echo "Running 1000 requests at c=100 (epoll)..."
+    ab -n 1000 -c 100 -q \
+        http://localhost:8000/test_data/1kb.txt >/dev/null 2>&1
 
-sleep 1
-kill -INT $SERVER_PID
-wait $SERVER_PID 2>/dev/null
-
-echo "--- syscall summary ---"
-cat ${OUTPUT_DIR}/syscalls_detailed.txt
-echo "✓ System call data saved"
-echo ""
+    sleep 1
+    sudo kill -INT $STRACE_PID
+    wait $STRACE_PID 2>/dev/null
+    echo "--- epoll syscalls ---"
+    cat ${OUTPUT_DIR}/syscalls_detailed.txt
+fi
 
 # Restart clean server for remaining tests
 ./build/fileserver_epoll 8000 &
@@ -236,17 +237,17 @@ for c in 10 50 100 500 1000 5000 10000; do
     fi
 
     if [ $c -le 1000 ]; then
-        n_requests=$((c / 2))
+        n_requests=$((c * 20))
         timeout=60
     elif [ $c -le 5000 ]; then
-        n_requests=$((c / 2))
+        n_requests=$((c * 20))
         timeout=120
     else
-        n_requests=$((c / 2))
+        n_requests=$((c * 10))
         timeout=180
     fi
-    [ $n_requests -lt 200 ] && n_requests=200
-    [ $n_requests -gt 2000 ] && n_requests=2000
+    [ $n_requests -lt 20000 ] && n_requests=20000
+    [ $n_requests -gt 50000 ] && n_requests=50000
 
     # Snapshot before
     cpu_before=$(get_proc_cpu_ticks $SERVER_PID)
@@ -280,5 +281,4 @@ done
 echo "========================================"
 echo "Benchmark Complete!"
 echo "Results in ${OUTPUT_DIR}/"
-echo "Run: python3 visualize_results_v2.py to generate graphs"
 echo "========================================"

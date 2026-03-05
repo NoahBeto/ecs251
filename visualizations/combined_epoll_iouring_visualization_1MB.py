@@ -125,35 +125,67 @@ class CompareVisuals:
         ax.grid(True, alpha=0.3)
         ax.legend(fontsize=12)
 
-        # 4. System Calls - side by side
-        ax = axes[1,1]
-        top_n = 6
-        i_sys = self.data['iouring']['syscalls']
+        # 4. System Calls - epoll only
+        ax = axes[1, 1]
         e_sys = self.data['epoll']['syscalls']
-        # Top system calls from both combined
-        combined = set(i_sys.keys()).union(e_sys.keys())
-        combined_top = sorted(combined, key=lambda k: max(i_sys.get(k,0), e_sys.get(k,0)), reverse=True)[:top_n]
 
-        x = range(len(combined_top))
-        width = 0.35
-        i_counts = [i_sys.get(k,0) for k in combined_top]
-        e_counts = [e_sys.get(k,0) for k in combined_top]
+        top_n = 6
+        top_calls = sorted(e_sys.items(), key=lambda x: x[1], reverse=True)[:top_n]
+        names  = [k for k, _ in top_calls]
+        counts = [v for _, v in top_calls]
+        total  = sum(e_sys.values())
 
-        ax.bar([p - width/2 for p in x], i_counts, width=width, color='#2E86AB', label='io_uring')
-        ax.bar([p + width/2 for p in x], e_counts, width=width, color='#FF6F61', label='epoll')
+        labels = names
 
-        ax.set_xticks(x)
-        ax.set_xticklabels(combined_top, rotation=45, ha='right')
+        bars = ax.bar(range(len(names)), counts, width=0.6, color='#FF6F61', alpha=0.9)
+
+        for bar, count in zip(bars, counts):
+            ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height(),
+                    f'{count}', ha='center', va='bottom', fontsize=11)
+
+        ax.set_xticks(range(len(names)))
+        ax.set_xticklabels(labels, rotation=0, ha='center', fontsize=12)
         ax.set_ylabel('Number of Calls', fontweight='bold')
-        ax.set_title('Top System Calls (1000 Requests)', fontweight='bold')
+        ax.set_title(f'Top System Calls - epoll (Total: {total})\n1000 Requests',
+                     fontweight='bold')
         ax.grid(True, alpha=0.3, axis='y')
-        ax.legend(fontsize=12)
 
         plt.tight_layout()
-        plt.suptitle('Comparison: io_uring vs epoll File Server', fontsize=16, fontweight='bold', y=1.02)
-        plt.savefig('benchmark_comparison_1MB.png', dpi=300)
+        plt.suptitle('Comparison: io_uring vs epoll File Server',
+                     fontsize=16, fontweight='bold', y=1.02)
+        plt.savefig('benchmark_comparison_1MB.png', dpi=300, bbox_inches='tight')
         print("✓ Saved: benchmark_comparison_1MB.png")
         plt.show()
+
+        # # 4. System Calls - side by side
+        # ax = axes[1,1]
+        # top_n = 6
+        # i_sys = self.data['iouring']['syscalls']
+        # e_sys = self.data['epoll']['syscalls']
+        # # Top system calls from both combined
+        # combined = set(i_sys.keys()).union(e_sys.keys())
+        # combined_top = sorted(combined, key=lambda k: max(i_sys.get(k,0), e_sys.get(k,0)), reverse=True)[:top_n]
+
+        # x = range(len(combined_top))
+        # width = 0.35
+        # i_counts = [i_sys.get(k,0) for k in combined_top]
+        # e_counts = [e_sys.get(k,0) for k in combined_top]
+
+        # # ax.bar([p - width/2 for p in x], i_counts, width=width, color='#2E86AB', label='io_uring')
+        # ax.bar([p + width/2 for p in x], e_counts, width=width, color='#FF6F61', label='epoll')
+
+        # ax.set_xticks(x)
+        # ax.set_xticklabels(combined_top, rotation=0, ha='right')
+        # ax.set_ylabel('Number of Calls', fontweight='bold')
+        # ax.set_title('Top System Calls (1000 Requests)', fontweight='bold')
+        # ax.grid(True, alpha=0.3, axis='y')
+        # ax.legend(fontsize=12)
+
+        # plt.tight_layout()
+        # plt.suptitle('Comparison: io_uring vs epoll File Server', fontsize=16, fontweight='bold', y=1.02)
+        # plt.savefig('benchmark_comparison_1MB.png', dpi=300)
+        # print("✓ Saved: benchmark_comparison_1MB.png")
+        # plt.show()
 
 def main():
     cmp_viz = CompareVisuals()
