@@ -11,8 +11,10 @@ import os
 from pathlib import Path
 
 class ComprehensiveVisualizer:
-    def __init__(self, results_dir='benchmark_results'):
+    def __init__(self, results_dir='benchmark_results_iouring_10MB'):
         self.results_dir = results_dir
+
+        Path(self.results_dir).mkdir(parents=True, exist_ok=True)
         
         # Data storage
         self.throughput = {}  # concurrency -> req/s
@@ -44,7 +46,7 @@ class ComprehensiveVisualizer:
         if match:
             result['transfer'] = float(match.group(1))
             
-        match = re.search(r'CPU Usage: ([\d.]+)%', content)
+        match = re.search(r'Peak CPU:\s*([\d.]+)%', content)
         if match:
             result['cpu'] = float(match.group(1))
             
@@ -54,19 +56,19 @@ class ComprehensiveVisualizer:
         """Load all benchmark data"""
         print("Loading data...")
         
-        # Throughput vs concurrency
+        # Throughput vs concurrency (10MB file)
         for c in [10, 50, 100, 500, 1000, 5000, 10000]:
-            data = self.parse_ab(f"{self.results_dir}/iouring_c{c}_1kb.txt")
+            data = self.parse_ab(f"{self.results_dir}/iouring_c{c}_10mb.txt")
             if 'rps' in data:
                 self.throughput[c] = data['rps']
                 if 'cpu' in data:
                     self.cpu_util[c] = data['cpu']
         
-        # Latency vs file size
-        files = {'1kb.txt': 1, '10kb.bin': 10, '100kb.bin': 100, 
-                 '1mb.bin': 1024, '10mb.bin': 10240}
+        # Latency vs file size - ALL .txt
+        files = {'1kb.txt': 1, '10kb.txt': 10, '100kb.txt': 100, 
+                 '1mb.txt': 1024, '10mb.txt': 10240}
         for fname, size in files.items():
-            data = self.parse_ab(f"{self.results_dir}/iouring_c100_{fname}")
+            data = self.parse_ab(f"{self.results_dir}/iouring_c500_{fname}")
             if 'latency' in data:
                 self.latency_filesize[size] = data['latency']
         
@@ -139,7 +141,7 @@ class ComprehensiveVisualizer:
         
         ax.set_xlabel('Concurrent Connections', fontsize=13, fontweight='bold')
         ax.set_ylabel('Throughput (req/s)', fontsize=13, fontweight='bold')
-        ax.set_title('Throughput vs Concurrency (10 to 10,000 clients)\n1KB File', 
+        ax.set_title('Throughput vs Concurrency (10 to 10,000 clients)\n10MB File', 
                     fontsize=15, fontweight='bold', pad=20)
         ax.grid(True, alpha=0.3, linestyle='--')
         ax.set_xscale('log')
@@ -151,7 +153,7 @@ class ComprehensiveVisualizer:
         plt.close()
     
     def plot_latency_extended(self):
-        """Latency vs File Size (1KB to 10MB)"""
+        """Latency vs File Size (10MB)"""
         if not self.latency_filesize:
             return
             
@@ -168,7 +170,7 @@ class ComprehensiveVisualizer:
         
         ax.set_xlabel('File Size (KB)', fontsize=13, fontweight='bold')
         ax.set_ylabel('Average Latency (ms)', fontsize=13, fontweight='bold')
-        ax.set_title('Latency vs File Size (1KB to 10MB)\n100 Concurrent Connections',
+        ax.set_title('Latency vs File Size (10MB)\n100 Concurrent Connections',
                     fontsize=15, fontweight='bold', pad=20)
         ax.grid(True, alpha=0.3, linestyle='--')
         ax.set_xscale('log')
@@ -311,7 +313,7 @@ class ComprehensiveVisualizer:
             f.write("=" * 80 + "\n\n")
             
             # 1. Throughput
-            f.write("1. THROUGHPUT vs CONCURRENCY (1KB file)\n")
+            f.write("1. THROUGHPUT vs CONCURRENCY (10MB file)\n")
             f.write("-" * 80 + "\n")
             if self.throughput:
                 for c in sorted(self.throughput.keys()):
