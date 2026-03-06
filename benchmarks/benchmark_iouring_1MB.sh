@@ -128,7 +128,6 @@ EOF
     echo ""
 done
 
-# no perf installed
 # ---------------------------------------------------------------
 # Test 4: CPU Profiling with perf
 # ---------------------------------------------------------------
@@ -150,14 +149,37 @@ done
 # fi
 # echo ""
 
-# something wrong with this system call analysis currently
+# ---------------------------------------------------------------
+# Test 5: System Call Analysis
+# FIX: always kill and restart server so strace captures the
+#      NEW binary (with batched submit).  Use -e trace=all to
+#      count iouring_enter separately from other syscalls.
+# ---------------------------------------------------------------
+echo "=== Test 5: System Call Analysis (1MB file) ==="
 
-# echo "=== Test 5: System Call Analysis (1MB file) ==="
+pkill -f "fileserver_iouring 8000" 2>/dev/null
+sleep 1
 
+sudo strace -c -o ${OUTPUT_DIR}/syscalls_detailed.txt \
+    ./build/fileserver_iouring 8000 &
+SERVER_PID=$!
+
+sleep 2
+
+echo "Running 5000 requests at c=200..."
+ab -n 5000 -c 200 -q \
+    http://localhost:8000/test_data/1mb.txt >/dev/null 2>&1
+
+sleep 1
+kill -INT $SERVER_PID
+wait $SERVER_PID 2>/dev/null
+
+echo "--- syscall summary ---"
+cat ${OUTPUT_DIR}/syscalls_detailed.txt
 
 # pkill -f "fileserver_iouring 8000"; sleep 1
 
-# # No filter: capture all syscalls including io_uring_enter.
+# # No filter: capture all syscalls including iouring_enter.
 # # No -f: single process only, avoids kernel-thread noise.
 # strace -c -o ${OUTPUT_DIR}/syscalls_detailed.txt \
 #     ./build/fileserver_iouring 8000 2>/dev/null &
@@ -194,7 +216,7 @@ for c in 10 50 100; do
         curl -s -X POST --data-binary @/tmp/upload_test.bin \
             http://localhost:8000/test_data/upload_${i}.bin &
     done
-    wait
+    # wait
     end_time=$(date +%s.%N)
     duration=$(echo "$end_time - $start_time" | bc)
     throughput=$(echo "scale=2; $c / $duration" | bc)

@@ -5,6 +5,7 @@
 
 OUTPUT_DIR="benchmark_results_iouring_10MB"
 mkdir -p $OUTPUT_DIR
+sudo -v
 
 echo "========================================"
 echo "10MB File Performance Benchmark"
@@ -76,6 +77,7 @@ for c in 10 50 100 500 1000 5000 10000; do
     echo "  Sending $n_requests requests at c=$c"
 
     ab -n $n_requests -c $c -s $timeout -k \
+        -H "Range: bytes=0-1048575" \
         -q http://localhost:8000/test_data/10mb.txt \
         2>&1 > "${OUTPUT_DIR}/iouring_c${c}_10mb.txt"
     AB_EXIT=$?
@@ -93,7 +95,7 @@ done
 # Test 2: Latency vs File Size (500 concurrent)
 # ---------------------------------------------------------------
 echo "=== Test 2: Latency vs File Size (500 concurrent) ==="
-for file in 1kb.txt 10mb.txt 100kb.txt 1mb.txt 10mb.txt; do
+for file in 1kb.txt 10kb.txt 100kb.txt 1mb.txt 10mb.txt; do
     echo "File: $file"
     ab -n 2000 -c 500 -q \
         http://localhost:8000/test_data/${file} \
@@ -113,7 +115,7 @@ for c in 10 100 1000; do
 request = function()
     headers = {}
     headers["Range"] = "bytes=0-1023"
-    return wrk.format("GET", "/test_data/1mb.txt", headers, nil)
+    return wrk.format("GET", "/test_data/10mb.txt", headers, nil)
 end
 EOF
         wrk -t4 -c$c -d10s -s /tmp/range.lua http://localhost:8000 \
@@ -121,7 +123,7 @@ EOF
                  | grep -E "Requests/sec|Latency"
     else
         ab -n 1000 -c $c -H "Range: bytes=0-1023" \
-            http://localhost:8000/test_data/1mb.txt \
+            http://localhost:8000/test_data/10mb.txt \
             2>&1 | tee "${OUTPUT_DIR}/range_c${c}.txt" \
                  | grep -E "Requests per second|Time per request"
     fi
@@ -153,14 +155,39 @@ done
 # Test 5: System Call Analysis
 # FIX: always kill and restart server so strace captures the
 #      NEW binary (with batched submit).  Use -e trace=all to
-#      count io_uring_enter separately from other syscalls.
+#      count iouring_enter separately from other syscalls.
 # ---------------------------------------------------------------
-# echo "=== Test 5: System Call Analysis (10MB file) ==="
+echo "=== Test 5: System Call Analysis (10MB file) ==="
+
+pkill -f "fileserver_iouring 8000" 2>/dev/null
+sleep 1
+
+sudo strace -c -o ${OUTPUT_DIR}/syscalls_detailed.txt \
+    ./build/fileserver_iouring 8000 &
+SERVER_PID=$!
+
+sleep 2
+
+echo "Running 5000 requests at c=200..."
+ab -n 5000 -c 200 -q \
+    http://localhost:8000/test_data/10mb.txt >/dev/null 2>&1
+
+sleep 1
+kill -INT $SERVER_PID
+wait $SERVER_PID 2>/dev/null
+
+echo "--- syscall summary ---"
+cat ${OUTPUT_DIR}/syscalls_detailed.txt
+if ! pgrep -f fileserver_iouring > /dev/null; then
+    echo "Restarting server..."
+    ./build/fileserver_iouring 8000 &
+    sleep 1
+fi
 
 # pkill -f "fileserver_iouring 8000"; sleep 1
 
-# No filter: capture all syscalls including io_uring_enter.
-# No -f: single process only, avoids kernel-thread noise.
+# # No filter: capture all syscalls including iouring_enter.
+# # No -f: single process only, avoids kernel-thread noise.
 # strace -c -o ${OUTPUT_DIR}/syscalls_detailed.txt \
 #     ./build/fileserver_iouring 8000 2>/dev/null &
 # SERVER_PID=$!
@@ -196,7 +223,7 @@ for c in 10 50 100; do
         curl -s -X POST --data-binary @/tmp/upload_test.bin \
             http://localhost:8000/test_data/upload_${i}.bin &
     done
-    wait
+    # wait
     end_time=$(date +%s.%N)
     duration=$(echo "$end_time - $start_time" | bc)
     throughput=$(echo "scale=2; $c / $duration" | bc)
@@ -254,6 +281,7 @@ for c in 10 50 100 500 1000 5000 10000; do
 
     # Run benchmark (foreground so timing is accurate)
     ab -n $n_requests -c $c -s $timeout -k \
+        -H "Range: bytes=0-1048575" \
         -q http://localhost:8000/test_data/10mb.txt \
         >/dev/null 2>&1
 
