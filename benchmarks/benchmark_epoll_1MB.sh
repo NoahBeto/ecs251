@@ -55,7 +55,7 @@ measure_cpu_during() {
 # Test 1: Throughput vs Concurrency (1MB file)
 # FIX: n_requests = max(20000, c*20) so each connection handles
 #      enough requests to amortise TCP setup cost and let
-#      io_uring's batching advantage show up.
+#      epoll's batching advantage show up.
 # ---------------------------------------------------------------
 echo "=== Test 1: Throughput vs Concurrency (1MB file) ==="
 for c in 10 50 100 500 1000 5000 10000; do
@@ -153,36 +153,33 @@ done
 # Test 5: System Call Analysis
 # FIX: always kill and restart server so strace captures the
 #      NEW binary (with batched submit).  Use -e trace=all to
-#      count io_uring_enter separately from other syscalls.
+#      count epoll_enter separately from other syscalls.
 # ---------------------------------------------------------------
 echo "=== Test 5: System Call Analysis (1MB file) ==="
 
-# --- epoll: use strace attach ---
-EPOLL_PID=$(pgrep -f "fileserver_epoll")
-if [ -z "$EPOLL_PID" ]; then
-    echo "Error: epoll server not running"; 
-else
-    echo 0 | sudo tee /proc/sys/kernel/yama/ptrace_scope >/dev/null
+pkill -f "fileserver_epoll 8000" 2>/dev/null
+sleep 1
 
-    sudo strace -c -p $EPOLL_PID \
-        -o ${OUTPUT_DIR}/syscalls_detailed.txt &
-    STRACE_PID=$!
-    sleep 2
+sudo strace -c -o ${OUTPUT_DIR}/syscalls_detailed.txt \
+    ./build/fileserver_epoll 8000 &
+SERVER_PID=$!
 
-    echo "Running 1000 requests at c=100 (epoll)..."
-    ab -n 1000 -c 100 -q \
-        http://localhost:8000/test_data/1mb.txt >/dev/null 2>&1
+sleep 2
 
-    sleep 1
-    sudo kill -INT $STRACE_PID
-    wait $STRACE_PID 2>/dev/null
-    echo "--- epoll syscalls ---"
-    cat ${OUTPUT_DIR}/syscalls_detailed.txt
-fi
+echo "Running 5000 requests at c=200..."
+ab -n 5000 -c 200 -q \
+    http://localhost:8000/test_data/1mb.txt >/dev/null 2>&1
+
+sleep 1
+kill -INT $SERVER_PID
+wait $SERVER_PID 2>/dev/null
+
+echo "--- syscall summary ---"
+cat ${OUTPUT_DIR}/syscalls_detailed.txt
 
 # pkill -f "fileserver_epoll 8000"; sleep 1
 
-# # No filter: capture all syscalls including io_uring_enter.
+# # No filter: capture all syscalls including epoll_enter.
 # # No -f: single process only, avoids kernel-thread noise.
 # strace -c -o ${OUTPUT_DIR}/syscalls_detailed.txt \
 #     ./build/fileserver_epoll 8000 2>/dev/null &
@@ -219,7 +216,7 @@ for c in 10 50 100; do
         curl -s -X POST --data-binary @/tmp/upload_test.bin \
             http://localhost:8000/test_data/upload_${i}.bin &
     done
-    wait
+    # wait
     end_time=$(date +%s.%N)
     duration=$(echo "$end_time - $start_time" | bc)
     throughput=$(echo "scale=2; $c / $duration" | bc)
