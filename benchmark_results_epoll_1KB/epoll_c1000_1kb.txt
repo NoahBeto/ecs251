@@ -1,0 +1,42 @@
+This is ApacheBench, Version 2.3 <$Revision: 1903618 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking localhost (be patient)...
+
+Server Software:        EpollServer
+Server Hostname:        localhost
+Server Port:            8000
+
+Document Path:          /test_data/1kb.txt
+Document Length:        1024 bytes
+
+Concurrency Level:      1000
+Time taken for tests:   0.484 seconds
+Complete requests:      4110
+Failed requests:        0
+Keep-Alive requests:    4110
+Total transferred:      5014905 bytes
+HTML transferred:       4208640 bytes
+Requests per second:    8491.74 [#/sec] (mean)
+Time per request:       117.762 [ms] (mean)
+Time per request:       0.118 [ms] (mean, across all concurrent requests)
+Transfer rate:          10118.53 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0    4   6.9      0      21
+Processing:     5   96   9.7     97     125
+Waiting:        0   46  18.0     47      85
+Total:         26  100   9.9     99     125
+
+Percentage of the requests served within a certain time (ms)
+  50%     99
+  66%    100
+  75%    105
+  80%    110
+  90%    110
+  95%    111
+  98%    118
+  99%    121
+ 100%    125 (longest request)

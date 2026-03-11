@@ -3,6 +3,8 @@
 # Benchmark for epoll file server - 1MB FILE ONLY
 # Based on ECS 251 evaluation plan
 
+ulimit -n 65536
+
 OUTPUT_DIR="benchmark_results_epoll_1MB"
 mkdir -p $OUTPUT_DIR
 
@@ -160,7 +162,10 @@ echo "=== Test 5: System Call Analysis (1MB file) ==="
 pkill -f "fileserver_epoll 8000" 2>/dev/null
 sleep 1
 
-sudo strace -c -o ${OUTPUT_DIR}/syscalls_detailed.txt \
+# sudo strace -c -o ${OUTPUT_DIR}/syscalls_detailed.txt \
+#     ./build/fileserver_epoll 8000 &
+strace -c -e trace=read,write,sendto,recvfrom,epoll_wait,epoll_ctl,accept4,open,close \
+    -o ${OUTPUT_DIR}/syscalls_detailed.txt \
     ./build/fileserver_epoll 8000 &
 SERVER_PID=$!
 
@@ -300,5 +305,5 @@ done
 echo "========================================"
 echo "Benchmark Complete!"
 echo "Results in ${OUTPUT_DIR}/"
-echo "Run: python3 visualize_results_epoll_1MB.py to generate graphs"
+echo "Run: python3 visualizations/visualize_results_epoll_1MB.py to generate graphs"
 echo "========================================"

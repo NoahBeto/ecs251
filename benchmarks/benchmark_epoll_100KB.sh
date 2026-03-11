@@ -302,5 +302,5 @@ done
 echo "========================================"
 echo "Benchmark Complete!"
 echo "Results in ${OUTPUT_DIR}/"
-echo "Run: python3 visualize_results_epoll_100KB.py to generate graphs"
+echo "Run: python3 visualizations/visualize_results_epoll_100KB.py to generate graphs"
 echo "========================================"

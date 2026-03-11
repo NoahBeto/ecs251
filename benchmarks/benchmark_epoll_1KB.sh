@@ -57,37 +57,37 @@ measure_cpu_during() {
 #      enough requests to amortise TCP setup cost and let
 #      io_uring's batching advantage show up.
 # ---------------------------------------------------------------
-echo "=== Test 1: Throughput vs Concurrency (1KB file) ==="
-for c in 10 50 100 500 1000 5000 10000; do
-    echo "Concurrency: $c"
+# echo "=== Test 1: Throughput vs Concurrency (1KB file) ==="
+# for c in 10 50 100 500 1000 5000 10000; do
+#     echo "Concurrency: $c"
 
-    SERVER_PID=$(pgrep -f fileserver_epoll)
-    if [ -z "$SERVER_PID" ]; then
-        echo "Error: Server not running"; continue
-    fi
+#     SERVER_PID=$(pgrep -f fileserver_epoll)
+#     if [ -z "$SERVER_PID" ]; then
+#         echo "Error: Server not running"; continue
+#     fi
 
-    # Each connection handles at least 20 requests (amortises TCP setup).
-    # Cap at 50000 to keep each concurrency level under ~30s.
-    n_requests=$((c * 20))
-    [ $n_requests -lt 20000 ] && n_requests=20000
-    [ $n_requests -gt 50000 ] && n_requests=50000
-    timeout=120
+#     # Each connection handles at least 20 requests (amortises TCP setup).
+#     # Cap at 50000 to keep each concurrency level under ~30s.
+#     n_requests=$((c * 20))
+#     [ $n_requests -lt 20000 ] && n_requests=20000
+#     [ $n_requests -gt 50000 ] && n_requests=50000
+#     timeout=120
 
-    echo "  Sending $n_requests requests at c=$c"
+#     echo "  Sending $n_requests requests at c=$c"
 
-    ab -n $n_requests -c $c -s $timeout -k \
-        -q http://localhost:8000/test_data/1kb.txt \
-        2>&1 > "${OUTPUT_DIR}/epoll_c${c}_1kb.txt"
-    AB_EXIT=$?
+#     ab -n $n_requests -c $c -s $timeout -k \
+#         -q http://localhost:8000/test_data/1kb.txt \
+#         2>&1 > "${OUTPUT_DIR}/epoll_c${c}_1kb.txt"
+#     AB_EXIT=$?
 
-    if [ $AB_EXIT -eq 0 ]; then
-        grep -E "Requests per second|Time per request|Failed requests" \
-            "${OUTPUT_DIR}/epoll_c${c}_1kb.txt"
-    else
-        echo "  Benchmark failed (exit $AB_EXIT)"
-    fi
-    echo ""
-done
+#     if [ $AB_EXIT -eq 0 ]; then
+#         grep -E "Requests per second|Time per request|Failed requests" \
+#             "${OUTPUT_DIR}/epoll_c${c}_1kb.txt"
+#     else
+#         echo "  Benchmark failed (exit $AB_EXIT)"
+#     fi
+#     echo ""
+# done
 
 # ---------------------------------------------------------------
 # Test 2: Latency vs File Size (500 concurrent)
@@ -97,8 +97,8 @@ for file in 1kb.txt 10kb.txt 100kb.txt 1mb.txt 10mb.txt; do
     echo "File: $file"
     ab -n 2000 -c 500 -q \
         http://localhost:8000/test_data/${file} \
-        2>&1 | tee "${OUTPUT_DIR}/epoll_c500_${file}" \
-             | grep -E "Requests per second|Time per request|Transfer rate"
+        2>&1 | tee "${OUTPUT_DIR}/epoll_c500_${file}" | \
+             grep -E "Requests per second|Time per request|Transfer rate"
     echo ""
 done
 
@@ -180,7 +180,7 @@ else
     cat ${OUTPUT_DIR}/syscalls_detailed.txt
 fi
 
-# pkill -f "fileserver_epoll 8000"; sleep 1
+pkill -f "fileserver_epoll 8000"; sleep 1
 
 # # No filter: capture all syscalls including io_uring_enter.
 # # No -f: single process only, avoids kernel-thread noise.
@@ -203,8 +203,12 @@ fi
 # echo ""
 
 # Restart clean server for remaining tests
-./build/fileserver_epoll 8000 &
-sleep 1
+# ./build/fileserver_epoll 8000 &
+
+# pkill -f fileserver_epoll; sleep 1 # For clean server on docker...
+
+# ./fileserver_epoll 8000 &
+# sleep 1
 
 # ---------------------------------------------------------------
 # Test 6: File Upload Performance
@@ -217,7 +221,7 @@ for c in 10 50 100; do
     start_time=$(date +%s.%N)
     for i in $(seq 1 $c); do
         curl -s -X POST --data-binary @/tmp/upload_test.bin \
-            http://localhost:8000/test_data/upload_${i}.bin &
+            http://localhost:8000/upload_${i}.bin &
     done
     wait
     end_time=$(date +%s.%N)
@@ -303,5 +307,8 @@ done
 echo "========================================"
 echo "Benchmark Complete!"
 echo "Results in ${OUTPUT_DIR}/"
-echo "Run: python3 visualize_results_epoll_1KB.py to generate graphs"
+echo "Run: python3 visualizations/visualize_results_epoll_1KB.py to generate graphs"
+
+echo "Killing server."
+pkill -f fileserver_epoll
 echo "========================================"

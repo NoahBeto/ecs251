@@ -180,8 +180,8 @@ echo "=== Test 5: System Call Analysis (100KB file) ==="
 # echo ""
 
 # Restart clean server for remaining tests
-./build/fileserver_iouring 8000 &
-sleep 1
+# ./build/fileserver_iouring 8000 &
+# sleep 1
 
 # ---------------------------------------------------------------
 # Test 6: File Upload Performance
@@ -194,6 +194,7 @@ for c in 10 50 100; do
     start_time=$(date +%s.%N)
     for i in $(seq 1 $c); do
         curl -s -X POST --data-binary @/tmp/upload_test.bin \
+            --max-time 1 \
             http://localhost:8000/test_data/upload_${i}.bin &
     done
     wait
@@ -267,6 +268,7 @@ for c in 10 50 100 500 1000 5000 10000; do
               'BEGIN {
                   delta_cpu  = ca - cb
                   delta_wall = wa - wb
+                  
                   if (delta_wall > 0)
                       printf "%.1f", delta_cpu / delta_wall * 100
                   else
@@ -280,5 +282,5 @@ done
 echo "========================================"
 echo "Benchmark Complete!"
 echo "Results in ${OUTPUT_DIR}/"
-echo "Run: python3 visualize_results_iouring_100KB.py to generate graphs"
+echo "Run: python3 visualizations/visualize_results_iouring_100KB.py to generate graphs"
 echo "========================================"

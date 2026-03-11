@@ -56,7 +56,9 @@ To install liburing on Ubuntu:
 sudo apt install liburing-dev
 ```
 ### Special Mac Instructions (TODO)
-For Mac, open docker in the terminal, running the following command to enter ubuntu:
+For Mac, open docker in the terminal. 
+
+To set up a docker container, run the following command to enter ubuntu:
 ```bash
 docker run --rm -it \
   --security-opt seccomp=unconfined \
@@ -85,6 +87,11 @@ docker compose up -d
 docker compose exec dev bash
 ```
 
+Run 
+```bash
+pip install --no-cache-dir matplotlib --break-system-packages
+```
+to install matplotlib on the VM. --break-system-packages is being used to get around building a virtual environment, which remains fine 
 
 ## Building the Servers
 
@@ -115,7 +122,7 @@ gcc -o fileserver_epoll fileserver_epoll.c
 Example:
 
 ```bash
-./fileserver_iouring 8080
+./fileserver_iouring 8000
 ```
 
 ### Run the epoll file server
@@ -127,7 +134,7 @@ Example:
 Example:
 
 ```bash
-./fileserver_epoll 8080
+./fileserver_epoll 8000
 ```
 
 The server will listen on the specified port and serve files from the current working directory.
@@ -171,6 +178,14 @@ The bottom left graph shows CPU usage steadily rising as more connections are ad
 A brief summary of the current evaluation results is available [here](https://github.com/NoahBeto/ecs251/blob/main/evaluation/io_uring_summary.txt)
 
 The epoll-based evaluation is currently in progress and will be added once testing is complete.
+
+## Frequent Problems
+- If a script does not have sufficient permissions to execute, run the following snippet to make it executable
+```bash
+chmod +x insert script name
+``` 
+- The benchmarks are hardcoded to localhost:8000. Please run with 8000 until this is patched.
+
 
 ## Attribution
 

@@ -181,8 +181,8 @@ else
 fi
 
 # Restart clean server for remaining tests
-./build/fileserver_epoll 8000 &
-sleep 1
+# ./build/fileserver_epoll 8000 &
+# sleep 1
 
 # ---------------------------------------------------------------
 # Test 6: File Upload Performance
@@ -281,5 +281,5 @@ done
 echo "========================================"
 echo "Benchmark Complete!"
 echo "Results in ${OUTPUT_DIR}/"
-echo "Run: python3 visualize_results_epoll_10KB.py to generate graphs"
+echo "Run: python3 visualizations/visualize_results_epoll_10KB.py to generate graphs"
 echo "========================================"
