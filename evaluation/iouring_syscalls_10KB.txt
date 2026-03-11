@@ -1,0 +1,4 @@
+http_requests 413160
+io_uring_submit 2426800
+io_uring_enter 2426800
+syscalls_per_request 5.8738

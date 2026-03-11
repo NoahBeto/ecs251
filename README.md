@@ -9,7 +9,7 @@ This project compares Linux io_uring and epoll by measuring their performance in
 
 The original code comes from: https://github.com/chen622/uring-server
 
-That project focuses on comparing io_uring and epoll using an HTTP workload. This repository builds on that work by adding a file server to study how both approaches behave when file I/O becomes the main performance bottleneck.
+That project focuses on comparing io_uring and epoll using an HTTP workload. This project builds on that work by adding a file server to look at how both approaches behave when file I/O becomes the main performance bottleneck.
 
 ## What Changed From the Original Project
 
@@ -22,7 +22,7 @@ This project adds:
 - A file server implemented using epoll
 - Benchmarking and analysis scripts for file-serving workloads
 
-The HTTP server code is reused for comparison purposes. The file server code and benchmarking additions are new.
+The codes for the file servers, benchmarks, and visualizers are new.
 
 ## Why a File Server?
 
@@ -32,15 +32,15 @@ A file server shifts the focus toward:
 - Disk I/O behavior
 - Interaction between file I/O and network I/O
 
-This makes it easier to observe where io_uring provides benefits over traditional epoll-based designs.
+This makes it easier to observe where io_uring provides benefits over traditional designs using epoll.
 
 ## Code Layout
 - fileserver_iouring.c: File server using io_uring
 - fileserver_epoll.c: File server using epoll
-- fileserver.h: Shared file server definitions
-- quick_benchmark.sh: Script for running basic benchmarks
-- syscall_analysis.sh: Script for system call analysis
-- nginx.jmx: JMeter workload configuration
+- fileserver.h: Shared definitions used by both servers
+- benchmarks: folder that contains all benchmarks used to test the performance of epoll and io_uring servers
+- evaluation: folder that contains figures and results of epoll and io_uring
+- visualizations: contains the code used to generate the figures and visualizations from the benchmark results
 
 ## Requirements
 
@@ -83,7 +83,6 @@ docker compose up -d
 docker compose exec dev bash
 ```
 
-
 ## Building the Servers
 
 Compile the servers using gcc.
@@ -113,7 +112,7 @@ gcc -o fileserver_epoll fileserver_epoll.c
 Example:
 
 ```bash
-./fileserver_iouring 8080
+./fileserver_iouring 8000
 ```
 
 ### Run the epoll file server
@@ -125,30 +124,28 @@ Example:
 Example:
 
 ```bash
-./fileserver_epoll 8080
+./fileserver_epoll 8000
 ```
 
 The server will listen on the specified port and serve files from the current working directory.
 
 ## Running Benchmarks
 
-To run a quick benchmark:
+To run a benchmark, open another terminal and run the following:
 
 ```bash
-./quick_benchmark.sh
+./benchmark_<Linx_kernel_interface>_<size>.sh
 ```
 
-For deeper analysis of system call behavior:
+Example:
 
 ```bash
-./syscall_analysis.sh
+./benchmark_epoll_1KB.sh
 ```
-
-JMeter can be used with the provided `nginx.jmx` file to generate load and compare throughput and latency between the different servers.
 
 ## Evaluation and Results
 
-At this stage, our evaluation focuses on the static file server using io_uring. These experiments are used to verify correctness and understand baseline performance before completing a direct comparison with the epoll-based implementation.
+At this stage, our evaluation focuses on the static file server using io_uring. These experiments are used to verify correctness and understand baseline performance before completing a direct comparison with the implementation using epoll.
 
 ### Functionality Verification
 
@@ -162,19 +159,17 @@ This figure shows how the io_uring file server performed during testing. The top
 
 The bottom left graph shows CPU usage steadily rising as more connections are added. The bottom right chart lists the system calls used most often during testing, with openat and mmap appearing the most, followed by others like fstat and close.
 
-![io_uring evaluation results](evaluation/io_uring_evaluation_summary.png)
-
 ### Notes
 
 A brief summary of the current evaluation results is available [here](https://github.com/NoahBeto/ecs251/blob/main/evaluation/io_uring_summary.txt)
 
-The epoll-based evaluation is currently in progress and will be added once testing is complete.
+The evaluation for epoll is currently in progress and will be added once testing is complete.
 
 ## Attribution
 
 The HTTP server implementations are derived from: https://github.com/chen622/uring-server
 
-All file server implementations and benchmarking extensions were added for this project as part of ECS 251.
+All file server implementations, benchmarking extensions, and visualizers were added for this project as part of ECS 251.
 
 ## Course Context
 
