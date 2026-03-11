@@ -5,6 +5,7 @@
 
 OUTPUT_DIR="benchmark_results_epoll_1MB"
 mkdir -p $OUTPUT_DIR
+sudo -v
 
 echo "========================================"
 echo "1MB File Performance Benchmark"
@@ -216,7 +217,7 @@ for c in 10 50 100; do
         curl -s -X POST --data-binary @/tmp/upload_test.bin \
             http://localhost:8000/test_data/upload_${i}.bin &
     done
-    # wait
+    wait
     end_time=$(date +%s.%N)
     duration=$(echo "$end_time - $start_time" | bc)
     throughput=$(echo "scale=2; $c / $duration" | bc)
