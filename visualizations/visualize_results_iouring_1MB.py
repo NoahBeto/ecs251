@@ -168,7 +168,7 @@ class ComprehensiveVisualizer:
         for x, y in zip(sizes, lats):
             ax.text(x, y * 1.05, f'{y:.2f}', ha='center', fontsize=9)
         
-        ax.set_xlabel('File Size (KB)', fontsize=13, fontweight='bold')
+        ax.set_xlabel('File Size (MB)', fontsize=13, fontweight='bold')
         ax.set_ylabel('Average Latency (ms)', fontsize=13, fontweight='bold')
         ax.set_title('Latency vs File Size (1MB)\n100 Concurrent Connections',
                     fontsize=15, fontweight='bold', pad=20)
@@ -263,7 +263,7 @@ class ComprehensiveVisualizer:
             sizes = sorted(self.latency_filesize.keys())
             lats = [self.latency_filesize[s] for s in sizes]
             ax2.plot(sizes, lats, 'o-', linewidth=2, markersize=8, color='#A23B72')
-            ax2.set_xlabel('File Size (KB)', fontweight='bold')
+            ax2.set_xlabel('File Size (MB)', fontweight='bold')
             ax2.set_ylabel('Latency (ms)', fontweight='bold')
             ax2.set_title('Latency vs File Size', fontweight='bold')
             ax2.set_xscale('log')

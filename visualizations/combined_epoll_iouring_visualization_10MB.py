@@ -106,7 +106,7 @@ class CompareVisuals:
             lats = [self.data[label]['latency'][s] for s in sizes]
             ax.plot(sizes, lats, 'o-', linewidth=2, markersize=8, color=color, label=label)
         ax.set_xscale('log')
-        ax.set_xlabel('File Size (KB)', fontweight='bold')
+        ax.set_xlabel('File Size (MB)', fontweight='bold')
         ax.set_ylabel('Latency (ms)', fontweight='bold')
         ax.set_title('Latency vs File Size', fontweight='bold')
         ax.grid(True, alpha=0.3)
