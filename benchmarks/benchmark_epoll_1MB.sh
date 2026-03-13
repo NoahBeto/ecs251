@@ -3,6 +3,8 @@
 # Benchmark for epoll file server - 1MB FILE ONLY
 # Based on ECS 251 evaluation plan
 
+# DEPRECATED
+
 ulimit -n 65536
 
 OUTPUT_DIR="benchmark_results_epoll_1MB"
@@ -219,7 +221,7 @@ for c in 10 50 100; do
     echo "Upload - Concurrency: $c"
     start_time=$(date +%s.%N)
     for i in $(seq 1 $c); do
-        curl -s -X POST --data-binary @/tmp/upload_test.bin \
+        curl -s --max-time -X POST --data-binary @/tmp/upload_test.bin \
             http://localhost:8000/test_data/upload_${i}.bin &
     done
     wait

@@ -179,7 +179,9 @@ else
     echo "--- epoll syscalls ---"
     cat ${OUTPUT_DIR}/syscalls_detailed.txt
 fi
-# pkill -f "fileserver_epoll 8000"; sleep 1
+
+# pgrep -af fileserver_epoll
+# pkill -f "./build/fileserver_epoll 8000"; sleep 2
 
 # # No filter: capture all syscalls including io_uring_enter.
 # # No -f: single process only, avoids kernel-thread noise.
@@ -202,8 +204,8 @@ fi
 # echo ""
 
 # Restart clean server for remaining tests
-./build/fileserver_epoll 8000 &
-sleep 1
+# ./build/fileserver_epoll 8000 &
+# sleep 1
 
 # ---------------------------------------------------------------
 # Test 6: File Upload Performance
@@ -215,7 +217,7 @@ for c in 10 50 100; do
     echo "Upload - Concurrency: $c"
     start_time=$(date +%s.%N)
     for i in $(seq 1 $c); do
-        curl -s -X POST --data-binary @/tmp/upload_test.bin \
+        curl -s --max-time 10 -X POST --data-binary  @/tmp/upload_test.bin \
             http://localhost:8000/test_data/upload_${i}.bin &
     done
     wait

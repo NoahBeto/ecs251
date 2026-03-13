@@ -5,7 +5,7 @@ Licensed to The Apache Software Foundation, http://www.apache.org/
 Benchmarking localhost (be patient).....done
 
 
-Server Software:        EpollServer
+Server Software:        
 Server Hostname:        localhost
 Server Port:            8000
 
@@ -13,31 +13,31 @@ Document Path:          /test_data/10kb.txt
 Document Length:        10240 bytes
 
 Concurrency Level:      50
-Time taken for tests:   17.404 seconds
+Time taken for tests:   18.047 seconds
 Complete requests:      20000
 Failed requests:        0
-Keep-Alive requests:    20000
-Total transferred:      208240000 bytes
+Keep-Alive requests:    0
+Total transferred:      206020000 bytes
 HTML transferred:       204800000 bytes
-Requests per second:    1149.19 [#/sec] (mean)
-Time per request:       43.509 [ms] (mean)
-Time per request:       0.870 [ms] (mean, across all concurrent requests)
-Transfer rate:          11684.94 [Kbytes/sec] received
+Requests per second:    1108.23 [#/sec] (mean)
+Time per request:       45.117 [ms] (mean)
+Time per request:       0.902 [ms] (mean, across all concurrent requests)
+Transfer rate:          11148.35 [Kbytes/sec] received
 
 Connection Times (ms)
               min  mean[+/-sd] median   max
-Connect:        0    0   0.2      0       6
-Processing:     9   43   2.3     44      63
-Waiting:        0    2   1.4      2      16
-Total:         10   43   2.2     44      63
+Connect:        0    0   0.2      0       9
+Processing:    15   45   5.3     46     104
+Waiting:        4   45   5.3     45     104
+Total:         15   45   5.3     46     104
 
 Percentage of the requests served within a certain time (ms)
-  50%     44
-  66%     44
-  75%     44
-  80%     44
-  90%     45
-  95%     46
-  98%     46
-  99%     47
- 100%     63 (longest request)
+  50%     46
+  66%     46
+  75%     46
+  80%     46
+  90%     47
+  95%     47
+  98%     52
+  99%     57
+ 100%    104 (longest request)
