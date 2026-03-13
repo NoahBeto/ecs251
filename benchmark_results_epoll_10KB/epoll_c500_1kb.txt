@@ -2,4 +2,41 @@ This is ApacheBench, Version 2.3 <$Revision: 1903618 $>
 Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
 Licensed to The Apache Software Foundation, http://www.apache.org/
 
-Benchmarking localhost (be patient)...apr_pollset_poll: The timeout specified has expired (70007)
+Benchmarking localhost (be patient).....done
+
+
+Server Software:        
+Server Hostname:        localhost
+Server Port:            8000
+
+Document Path:          /test_data/1kb.txt
+Document Length:        1024 bytes
+
+Concurrency Level:      500
+Time taken for tests:   2.333 seconds
+Complete requests:      2000
+Failed requests:        0
+Total transferred:      2168000 bytes
+HTML transferred:       2048000 bytes
+Requests per second:    857.22 [#/sec] (mean)
+Time per request:       583.282 [ms] (mean)
+Time per request:       1.167 [ms] (mean, across all concurrent requests)
+Transfer rate:          907.45 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0    1   2.2      0       8
+Processing:   278  427  47.5    452     544
+Waiting:      278  427  47.4    452     534
+Total:        286  429  45.3    452     544
+
+Percentage of the requests served within a certain time (ms)
+  50%    452
+  66%    453
+  75%    464
+  80%    464
+  90%    465
+  95%    465
+  98%    465
+  99%    465
+ 100%    544 (longest request)

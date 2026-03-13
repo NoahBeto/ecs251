@@ -5,46 +5,61 @@ ECS 251 Operating Systems Final Project
 
 1. THROUGHPUT vs CONCURRENCY (10KB file)
 --------------------------------------------------------------------------------
-      10 connections:     231.59 req/s
-      50 connections:    1251.02 req/s
-     100 connections:    2231.64 req/s
-    1000 connections:     384.13 req/s
+      10 connections:    1065.26 req/s
+      50 connections:    1108.23 req/s
+     100 connections:    1102.77 req/s
+     500 connections:    1109.71 req/s
+    1000 connections:    1103.53 req/s
+    5000 connections:    1094.34 req/s
+   10000 connections:    1071.90 req/s
 
-  Peak throughput: 2231.64 req/s @ 100 connections
+  Peak throughput: 1109.71 req/s @ 500 connections
 
 2. LATENCY vs FILE SIZE (100 concurrent)
 --------------------------------------------------------------------------------
+       1KB:   583.28 ms
+      10KB:   450.57 ms
+     100KB:   462.51 ms
+       1MB:   463.85 ms
+      10MB:  1236.72 ms
 
 3. CPU UTILIZATION
 --------------------------------------------------------------------------------
-      10 connections:  71.40%
-      50 connections:  64.70%
-     100 connections:  63.90%
-     500 connections:  63.90%
-    1000 connections:  64.10%
-    5000 connections:  65.80%
-   10000 connections:  66.90%
+      10 connections:  23.50%
+      50 connections:  24.10%
+     100 connections:  23.90%
+     500 connections:  23.40%
+    1000 connections:  23.30%
+    5000 connections:  23.10%
+   10000 connections:  23.00%
 
 4. SYSTEM CALLS (1000 requests)
 --------------------------------------------------------------------------------
-  Total system calls: 1054
-  Calls per request:  1.05
+  Total system calls: 11002
+  Calls per request:  11.00
 
   Top system calls:
-    getcwd                  230 calls
-    readlinkat              229 calls
-    epoll_ctl               121 calls
-    sendto                  118 calls
-    recvfrom                118 calls
-    fstat                   115 calls
-    openat                  114 calls
-    close                     6 calls
-    pread64                   3 calls
+    close                  2000 calls
+    epoll_pwait            1002 calls
+    sendfile               1000 calls
+    write                  1000 calls
+    openat                 1000 calls
+    accept                 1000 calls
+    read                   1000 calls
+    epoll_ctl              1000 calls
+    fstat                  1000 calls
+    fcntl                  1000 calls
+
+5. RANGE REQUEST PERFORMANCE
+--------------------------------------------------------------------------------
+      10 connections:    1014.07 req/s
+     100 connections:    1069.40 req/s
+    1000 connections:    1050.02 req/s
 
 6. FILE UPLOAD PERFORMANCE (100KB files)
 --------------------------------------------------------------------------------
-      10 concurrent:   510.31 uploads/s
-      50 concurrent:  1665.31 uploads/s
-     100 concurrent:  1892.66 uploads/s
+      10 concurrent:   555.50 uploads/s
+      50 concurrent:   803.68 uploads/s
+     100 concurrent:  1007.92 uploads/s
 
 ================================================================================

@@ -3,4 +3,51 @@ Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
 Licensed to The Apache Software Foundation, http://www.apache.org/
 
 Benchmarking localhost (be patient)
-apr_pollset_poll: The timeout specified has expired (70007)
+Completed 100 requests
+Completed 200 requests
+Completed 300 requests
+Completed 400 requests
+Completed 500 requests
+Completed 600 requests
+Completed 700 requests
+Completed 800 requests
+Completed 900 requests
+Completed 1000 requests
+Finished 1000 requests
+
+
+Server Software:        
+Server Hostname:        localhost
+Server Port:            8000
+
+Document Path:          /test_data/1mb.txt
+Document Length:        1048576 bytes
+
+Concurrency Level:      1000
+Time taken for tests:   0.927 seconds
+Complete requests:      1000
+Failed requests:        0
+Total transferred:      1048639000 bytes
+HTML transferred:       1048576000 bytes
+Requests per second:    1078.87 [#/sec] (mean)
+Time per request:       926.899 [ms] (mean)
+Time per request:       0.927 [ms] (mean, across all concurrent requests)
+Transfer rate:          1104825.36 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0    8   2.0      8      11
+Processing:    16  742 100.1    743     911
+Waiting:        1  742 100.3    743     911
+Total:         16  750  98.3    751     915
+
+Percentage of the requests served within a certain time (ms)
+  50%    751
+  66%    803
+  75%    833
+  80%    850
+  90%    883
+  95%    899
+  98%    909
+  99%    912
+ 100%    915 (longest request)

@@ -2,9 +2,10 @@ This is ApacheBench, Version 2.3 <$Revision: 1903618 $>
 Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
 Licensed to The Apache Software Foundation, http://www.apache.org/
 
-Benchmarking localhost (be patient)...
+Benchmarking localhost (be patient).....done
 
-Server Software:        EpollServer
+
+Server Software:        
 Server Hostname:        localhost
 Server Port:            8000
 
@@ -12,31 +13,31 @@ Document Path:          /test_data/1kb.txt
 Document Length:        1024 bytes
 
 Concurrency Level:      5000
-Time taken for tests:   0.872 seconds
-Complete requests:      5170
+Time taken for tests:   45.228 seconds
+Complete requests:      50000
 Failed requests:        0
-Keep-Alive requests:    5170
-Total transferred:      6617107 bytes
-HTML transferred:       5294080 bytes
-Requests per second:    5930.18 [#/sec] (mean)
-Time per request:       843.144 [ms] (mean)
-Time per request:       0.169 [ms] (mean, across all concurrent requests)
-Transfer rate:          7412.18 [Kbytes/sec] received
+Keep-Alive requests:    0
+Total transferred:      54200000 bytes
+HTML transferred:       51200000 bytes
+Requests per second:    1105.52 [#/sec] (mean)
+Time per request:       4522.752 [ms] (mean)
+Time per request:       0.905 [ms] (mean, across all concurrent requests)
+Transfer rate:          1170.30 [Kbytes/sec] received
 
 Connection Times (ms)
               min  mean[+/-sd] median   max
-Connect:        0   65  25.8     66     102
-Processing:    24  458  67.1    472     496
-Waiting:        0  215 122.7    218     426
-Total:         24  524  62.8    537     550
+Connect:        0  177 378.3      0    1066
+Processing:   170 4258 506.4   4534    4608
+Waiting:        1 4258 506.4   4534    4608
+Total:        170 4435 361.1   4542    4667
 
 Percentage of the requests served within a certain time (ms)
-  50%    537
-  66%    544
-  75%    546
-  80%    547
-  90%    549
-  95%    550
-  98%    550
-  99%    550
- 100%    550 (longest request)
+  50%   4542
+  66%   4560
+  75%   4565
+  80%   4568
+  90%   4596
+  95%   4602
+  98%   4608
+  99%   4615
+ 100%   4667 (longest request)
