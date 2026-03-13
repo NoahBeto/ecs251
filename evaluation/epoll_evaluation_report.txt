@@ -1,0 +1,48 @@
+================================================================================
+epoll File Server - Evaluation Report
+================================================================================
+
+1. THROUGHPUT vs CONCURRENCY (1KB file)
+--------------------------------------------------------------------------------
+      10 connections:    7945.97 req/s
+      50 connections:   13591.02 req/s
+     100 connections:    3747.61 req/s
+     500 connections:   21438.62 req/s
+    1000 connections:   26216.72 req/s
+    5000 connections:   24525.02 req/s
+   10000 connections:    8648.30 req/s
+
+  Peak throughput: 26216.72 req/s @ 1000 connections
+
+2. LATENCY vs FILE SIZE (100 concurrent)
+--------------------------------------------------------------------------------
+       1KB:    26.68 ms
+      10KB:     3.96 ms
+     100KB:     2.76 ms
+       1MB:     2.92 ms
+      10MB:     2.76 ms
+
+3. CPU UTILIZATION
+--------------------------------------------------------------------------------
+      10 connections:  11.90%
+      50 connections:  12.50%
+     100 connections:  13.00%
+     500 connections:  13.50%
+    1000 connections:  14.10%
+    5000 connections:  14.70%
+   10000 connections:  15.20%
+
+4. SYSTEM CALLS (1000 requests)
+--------------------------------------------------------------------------------
+
+5. RANGE REQUEST PERFORMANCE
+--------------------------------------------------------------------------------
+      10 connections:   29883.75 req/s
+     100 connections:   36540.36 req/s
+    1000 connections:   26023.37 req/s
+6. FILE UPLOAD PERFORMANCE (100KB files)
+--------------------------------------------------------------------------------
+      10 concurrent:   197.45 uploads/s
+      50 concurrent:  1421.36 uploads/s
+     100 concurrent:  1501.71 uploads/s
+================================================================================

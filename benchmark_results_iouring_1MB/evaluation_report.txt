@@ -1,0 +1,65 @@
+================================================================================
+io_uring File Server - Evaluation Report
+ECS 251 Operating Systems Final Project
+================================================================================
+
+1. THROUGHPUT vs CONCURRENCY (1MB file)
+--------------------------------------------------------------------------------
+      10 connections:    2849.31 req/s
+      50 connections:    2818.50 req/s
+     100 connections:    2671.47 req/s
+     500 connections:    2040.69 req/s
+    1000 connections:    2163.97 req/s
+    5000 connections:    1447.98 req/s
+   10000 connections:     988.08 req/s
+
+  Peak throughput: 2849.31 req/s @ 10 connections
+
+2. LATENCY vs FILE SIZE (100 concurrent)
+--------------------------------------------------------------------------------
+       1KB:    36.57 ms
+      10KB:    35.76 ms
+     100KB:    42.80 ms
+       1MB:   245.02 ms
+      10MB:  1939.12 ms
+
+3. CPU UTILIZATION
+--------------------------------------------------------------------------------
+      10 connections: 128.80%
+      50 connections: 148.50%
+     100 connections: 156.80%
+     500 connections: 149.60%
+    1000 connections: 152.80%
+    5000 connections: 143.80%
+   10000 connections: 136.00%
+
+4. SYSTEM CALLS (1000 requests)
+--------------------------------------------------------------------------------
+  Total system calls: 115558
+  Calls per request:  115.56
+
+  Top system calls:
+    io_uring_enter       100004 calls
+    close                 10005 calls
+    fstat                  5006 calls
+    brk                     485 calls
+    mmap                     12 calls
+    write                     8 calls
+    munmap                    7 calls
+    mprotect                  6 calls
+    openat                    5 calls
+    read                      4 calls
+
+5. RANGE REQUEST PERFORMANCE
+--------------------------------------------------------------------------------
+      10 connections:    8780.09 req/s
+     100 connections:   11441.65 req/s
+    1000 connections:   10466.49 req/s
+
+6. FILE UPLOAD PERFORMANCE (100KB files)
+--------------------------------------------------------------------------------
+      10 concurrent:  1421.01 uploads/s
+      50 concurrent:   766.14 uploads/s
+     100 concurrent:  1359.39 uploads/s
+
+================================================================================

@@ -1,0 +1,38 @@
+# --- macOS / Linux Junk ---
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+Thumbs.db
+.cache/
+
+# --- Build Artifacts ---
+# Keeps your 'build' folder and compiled binaries out of the image
+build/
+bin/
+obj/
+*.o
+*.a
+*.so
+*.out
+fileserver_epoll
+
+# --- Python Junk ---
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+ENV/
+.pytest_cache/
+
+# --- Git ---
+.git
+.gitignore
+.gitattributes
+
+# --- Benchmark Data ---
+# Prevents old benchmark results from being baked into new images
+benchmark_results/
+benchmark_results_epoll/
+test_data/

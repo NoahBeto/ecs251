@@ -12,6 +12,9 @@ compile_commands.json
 CTestTestfile.cmake
 _deps
 
+# Test files
+/test_data
+
 ### C++ template
 # Prerequisites
 *.d
@@ -157,3 +160,6 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+# Extra Docker things
+.DS_Store

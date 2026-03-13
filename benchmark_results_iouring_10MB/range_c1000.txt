@@ -1,0 +1,53 @@
+This is ApacheBench, Version 2.3 <$Revision: 1903618 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking localhost (be patient)
+Completed 100 requests
+Completed 200 requests
+Completed 300 requests
+Completed 400 requests
+Completed 500 requests
+Completed 600 requests
+Completed 700 requests
+Completed 800 requests
+Completed 900 requests
+Completed 1000 requests
+Finished 1000 requests
+
+
+Server Software:        StaticFileServer/1.0
+Server Hostname:        localhost
+Server Port:            8000
+
+Document Path:          /test_data/10mb.txt
+Document Length:        1024 bytes
+
+Concurrency Level:      1000
+Time taken for tests:   0.090 seconds
+Complete requests:      1000
+Failed requests:        0
+Total transferred:      1231000 bytes
+HTML transferred:       1024000 bytes
+Requests per second:    11170.31 [#/sec] (mean)
+Time per request:       89.523 [ms] (mean)
+Time per request:       0.090 [ms] (mean, across all concurrent requests)
+Transfer rate:          13428.38 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0   10   2.2     10      14
+Processing:    13   66   4.5     67      70
+Waiting:        0   38  18.5     52      55
+Total:         20   76   4.0     76      80
+
+Percentage of the requests served within a certain time (ms)
+  50%     76
+  66%     76
+  75%     77
+  80%     77
+  90%     78
+  95%     78
+  98%     79
+  99%     80
+ 100%     80 (longest request)

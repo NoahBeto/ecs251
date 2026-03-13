@@ -1,0 +1,61 @@
+================================================================================
+epoll File Server - Evaluation Report
+ECS 251 Operating Systems Final Project
+================================================================================
+
+1. THROUGHPUT vs CONCURRENCY (1MB file)
+--------------------------------------------------------------------------------
+      10 connections:   58054.98 req/s
+      50 connections:   62877.86 req/s
+     100 connections:   60116.20 req/s
+     500 connections:   48041.12 req/s
+    1000 connections:   56258.32 req/s
+    5000 connections:   50311.02 req/s
+   10000 connections:   33140.54 req/s
+
+  Peak throughput: 62877.86 req/s @ 50 connections
+
+2. LATENCY vs FILE SIZE (100 concurrent)
+--------------------------------------------------------------------------------
+       1KB:    11.14 ms
+      10KB:    10.96 ms
+     100KB:    10.05 ms
+       1MB:    10.41 ms
+      10MB:    10.26 ms
+
+3. CPU UTILIZATION
+--------------------------------------------------------------------------------
+      10 connections:  68.60%
+      50 connections:  65.70%
+     100 connections:  63.90%
+     500 connections:  69.60%
+    1000 connections:  61.70%
+    5000 connections:  67.40%
+   10000 connections:  64.50%
+
+4. SYSTEM CALLS (1000 requests)
+--------------------------------------------------------------------------------
+  Total system calls: 30008
+  Calls per request:  30.01
+
+  Top system calls:
+    epoll_ctl             10001 calls
+    sendto                10000 calls
+    close                  5003 calls
+    recvfrom               5000 calls
+    read                      3 calls
+    write                     1 calls
+
+5. RANGE REQUEST PERFORMANCE
+--------------------------------------------------------------------------------
+      10 connections:   60816.15 req/s
+     100 connections:   57947.50 req/s
+    1000 connections:   45829.51 req/s
+
+6. FILE UPLOAD PERFORMANCE (100KB files)
+--------------------------------------------------------------------------------
+      10 concurrent:   697.00 uploads/s
+      50 concurrent:   666.76 uploads/s
+     100 concurrent:  1801.71 uploads/s
+
+================================================================================

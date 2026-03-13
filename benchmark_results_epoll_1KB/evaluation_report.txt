@@ -1,0 +1,53 @@
+================================================================================
+epoll File Server - Evaluation Report
+ECS 251 Operating Systems Final Project
+================================================================================
+
+1. THROUGHPUT vs CONCURRENCY (1KB file)
+--------------------------------------------------------------------------------
+      10 connections:     230.42 req/s
+      50 connections:    1165.70 req/s
+     100 connections:    2207.70 req/s
+    1000 connections:    8491.74 req/s
+    5000 connections:    5930.18 req/s
+   10000 connections:     204.02 req/s
+
+  Peak throughput: 8491.74 req/s @ 1000 connections
+
+2. LATENCY vs FILE SIZE (100 concurrent)
+--------------------------------------------------------------------------------
+
+3. CPU UTILIZATION
+--------------------------------------------------------------------------------
+      10 connections:   2.70%
+      50 connections:   6.40%
+     100 connections:   7.70%
+     500 connections:  28.70%
+    1000 connections:  29.70%
+    5000 connections:  32.80%
+   10000 connections:  30.90%
+
+4. SYSTEM CALLS (1000 requests)
+--------------------------------------------------------------------------------
+  Total system calls: 2211
+  Calls per request:  2.21
+
+  Top system calls:
+    epoll_ctl               400 calls
+    recvfrom                300 calls
+    close                   200 calls
+    sendto                  200 calls
+    fcntl                   200 calls
+    readlinkat              200 calls
+    getcwd                  200 calls
+    accept                  102 calls
+    brk                     101 calls
+    openat                  100 calls
+
+6. FILE UPLOAD PERFORMANCE (100KB files)
+--------------------------------------------------------------------------------
+      10 concurrent:   271.85 uploads/s
+      50 concurrent:   969.40 uploads/s
+     100 concurrent:  1509.21 uploads/s
+
+================================================================================

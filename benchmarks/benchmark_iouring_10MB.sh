@@ -221,6 +221,7 @@ for c in 10 50 100; do
     start_time=$(date +%s.%N)
     for i in $(seq 1 $c); do
         curl -s -X POST --data-binary @/tmp/upload_test.bin \
+            --max-time 1 \
             http://localhost:8000/test_data/upload_${i}.bin &
     done
     wait
@@ -308,5 +309,5 @@ done
 echo "========================================"
 echo "Benchmark Complete!"
 echo "Results in ${OUTPUT_DIR}/"
-echo "Run: python3 visualize_results_iouring_10MB.py to generate graphs"
+echo "Run: python3 visualizations/visualize_results_iouring_10MB.py to generate graphs"
 echo "========================================"

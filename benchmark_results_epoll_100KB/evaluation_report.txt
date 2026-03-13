@@ -1,0 +1,65 @@
+================================================================================
+epoll File Server - Evaluation Report
+ECS 251 Operating Systems Final Project
+================================================================================
+
+1. THROUGHPUT vs CONCURRENCY (100KB file)
+--------------------------------------------------------------------------------
+      10 connections:   56443.76 req/s
+      50 connections:   52187.30 req/s
+     100 connections:   52004.65 req/s
+     500 connections:   47911.08 req/s
+    1000 connections:   38737.39 req/s
+    5000 connections:   45097.17 req/s
+   10000 connections:   36787.75 req/s
+
+  Peak throughput: 56443.76 req/s @ 10 connections
+
+2. LATENCY vs FILE SIZE (100 concurrent)
+--------------------------------------------------------------------------------
+       1KB:    12.28 ms
+      10KB:    10.71 ms
+     100KB:    10.44 ms
+       1MB:    10.77 ms
+      10MB:    15.26 ms
+
+3. CPU UTILIZATION
+--------------------------------------------------------------------------------
+      10 connections:  67.60%
+      50 connections:  66.70%
+     100 connections:  64.70%
+     500 connections:  61.10%
+    1000 connections:  63.20%
+    5000 connections:  63.80%
+   10000 connections:  63.90%
+
+4. SYSTEM CALLS (1000 requests)
+--------------------------------------------------------------------------------
+  Total system calls: 11103
+  Calls per request:  11.10
+
+  Top system calls:
+    sendto                 2000 calls
+    epoll_ctl              2000 calls
+    fcntl                  2000 calls
+    accept                 1011 calls
+    close                  1000 calls
+    recvfrom               1000 calls
+    readlinkat             1000 calls
+    getcwd                 1000 calls
+    brk                      70 calls
+    epoll_pwait              22 calls
+
+5. RANGE REQUEST PERFORMANCE
+--------------------------------------------------------------------------------
+      10 connections:   57924.00 req/s
+     100 connections:   50607.29 req/s
+    1000 connections:   43114.60 req/s
+
+6. FILE UPLOAD PERFORMANCE (100KB files)
+--------------------------------------------------------------------------------
+      10 concurrent:   399.79 uploads/s
+      50 concurrent:  1182.64 uploads/s
+     100 concurrent:   688.00 uploads/s
+
+================================================================================
