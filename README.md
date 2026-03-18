@@ -28,7 +28,7 @@ We mapped these goals to the repository as follows:
 | Analyze system calls and CPU usage              | System call counting (`fileserver_iouring_wcount.c`) and included tables/graphs in evaluation. |
 | Large file benchmarks (1 MB & 10 MB)           | Raw images stored in `evaluation/`, referenced in README, with caution noted about accuracy. |
 
-This table explicitly links each component of the project plan to the code and results found in this repository.
+This table shows how each component of the project plan corresponds to the code and results in this repository.
 
 ## What Changed From the Original Project
 
