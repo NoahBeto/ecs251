@@ -58,7 +58,7 @@ To install liburing on Ubuntu:
 ```bash
 sudo apt install liburing-dev
 ```
-### Docker Setup (Mac)
+### Docker Setup
 
 **Note:** Some commands below open an interactive shell inside a Docker container.  
 While inside the container, Docker commands will not work. If you need to return to your host terminal to run another Docker command, type:
@@ -67,9 +67,9 @@ While inside the container, Docker commands will not work. If you need to return
 exit
 ```
 
-For Mac, open docker in the terminal. 
+For macOS, open Docker in the terminal. For Windows, open a WSL terminal (such as Ubuntu) and make sure Docker is running.
 
-To set up a docker container, run the following command to enter ubuntu:
+To set up a Docker container, run the following command to enter ubuntu:
 ```bash
 docker run --rm -it \
   --security-opt seccomp=unconfined \
@@ -102,7 +102,7 @@ Run
 ```bash
 pip install --no-cache-dir matplotlib --break-system-packages
 ```
-to install matplotlib on the VM. --break-system-packages is being used to get around building a virtual environment, which remains fine 
+to install matplotlib on the VM. `--break-system-packages` is used here to avoid creating a virtual environment inside the container.
 
 ## Building the Servers
 
@@ -175,7 +175,7 @@ Each benchmark figure contains four graphs:
 - **Bottom-left graph:** CPU usage as concurrency increases  
 - **Bottom-right graph:** system calls used most often during testing (epoll only)
 
-The following subsections present results grouped by file size.
+The following subsections present results grouped by file size. Below, we present results for 1 KB, 10 KB, and 100 KB files.
 
 ### 1 KB File Benchmarks
 
@@ -219,12 +219,17 @@ To provide a complete comparison of **syscall overhead**, we created `fileserver
 - For io_uring, counting `io_uring_submit()` calls results in ~6 calls per request.  
 - **Explanation:** Epoll requires separate system calls for waiting, reading, and writing, while io_uring can submit multiple operations through shared ring buffers. This reduces syscall overhead and improves efficiency.
 
-All results now include **direct comparisons between epoll and io_uring**, demonstrating how io_uring reduces syscall overhead and improves performance for file-serving workloads.
+Overall, io_uring consistently maintained higher throughput and lower syscall overhead compared to epoll, especially under high concurrency.
+
+**Note:** We also have benchmarks for 1 MB and 10 MB files for both io_uring and epoll.  
+These results are not included in the visualizations because we are not confident in their accuracy, but the raw images can be found here:  
+- [1 MB Benchmark](https://github.com/NoahBeto/ecs251/blob/main/evaluation/benchmark_comparison_1MB.png)  
+- [10 MB Benchmark](https://github.com/NoahBeto/ecs251/blob/main/evaluation/benchmark_comparison_10MB.png)
 
 ## Frequent Problems
 - If a script does not have sufficient permissions to execute, run the following snippet to make it executable
 ```bash
-chmod +x insert script name
+chmod +x <script_name>
 ``` 
 - The benchmarks are hardcoded to localhost:8000. Please run with 8000 until this is patched.
 
