@@ -192,7 +192,7 @@ The following subsections present results grouped by file size. Below, we presen
 ![10KB Benchmark](evaluation/benchmark_comparison_10KB.png)
 
 - **Throughput:** io_uring continues to scale better at higher concurrency. Epoll throughput declines more noticeably under load.  
-- **Latency:** Latency increases slightly as file size grows. io_uring maintains similar or slightly lower latency than epoll.  
+- **Latency:** Latency increases slightly as file size grows. io_uring maintains slightly lower latency than epoll.  
 - **CPU Utilization:** io_uring CPU usage remains steady, while epoll drops at high concurrency.
 
 ---
