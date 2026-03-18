@@ -55,7 +55,7 @@ To install liburing on Ubuntu:
 ```bash
 sudo apt install liburing-dev
 ```
-### Special Mac Instructions (TODO)
+### Special Mac Instructions
 For Mac, open docker in the terminal. 
 
 To set up a docker container, run the following command to enter ubuntu:
