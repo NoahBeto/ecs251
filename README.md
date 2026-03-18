@@ -11,7 +11,7 @@ The original code comes from: https://github.com/chen622/uring-server
 
 That project focuses on comparing io_uring and epoll using an HTTP workload. This project builds on that work by adding a file server to look at how both approaches behave when file I/O becomes the main performance bottleneck.
 
-## Project Plan to Code Mapping
+## Project Plan
 
 The original project plan outlined three main goals:
 1. Compare io_uring and epoll performance for network I/O.
@@ -75,6 +75,13 @@ This makes it easier to observe where io_uring provides benefits over traditiona
 
 **Additional Notes:**
 - There is also a folder `benchmarks/benchmark_cpu_tests` containing additional CPU-focused benchmarks. While these are not directly used in the main evaluation, results are available there.
+
+## Team Contributions
+
+- **Noah**: Wrote benchmark and visualization scripts for io_uring, ran performance tests, updated README.
+- **Zhijie**: Implemented the io_uring file server, wrote test code, and ran performance tests.  
+- **QiKai**: Modified the HTTP server into a file server using epoll, tested and debugged the code, ran performance tests.  
+- **Xingming**: Modified the HTTP server into a file server using epoll, set up and debugged Docker, and ran performance tests.
 
 ## Requirements
 
