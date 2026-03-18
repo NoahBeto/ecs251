@@ -73,6 +73,9 @@ This makes it easier to observe where io_uring provides benefits over traditiona
 - `benchmarks/benchmark_cpu_tests/`  
   Extra benchmarks for CPU-intensive operations. These tests expand the evaluation beyond basic file/network I/O, addressing exploratory aspects of the project plan.
 
+- `clean_server.sh`  
+  Script to clean up compiled server binaries and temporary files. Useful for resetting the environment before rebuilding or running new tests.
+
 **Additional Notes:**
 - There is also a folder `benchmarks/benchmark_cpu_tests` containing additional CPU-focused benchmarks. While these are not directly used in the main evaluation, results are available there.
 
