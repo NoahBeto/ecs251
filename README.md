@@ -22,11 +22,11 @@ This project adds:
 - A file server implemented using epoll
 - Benchmarking and analysis scripts for file-serving workloads
 
-The codes for the file servers, benchmarks, and visualizers are new.
+The code for the file servers, benchmarks, and visualizers are new.
 
 ## Why a File Server?
 
-HTTP workloads often involve small responses and protocol parsing.
+HTTP workloads often involve small responses and protocol parsing.  
 A file server shifts the focus toward:
 - Large file reads
 - Disk I/O behavior
@@ -35,12 +35,15 @@ A file server shifts the focus toward:
 This makes it easier to observe where io_uring provides benefits over traditional designs using epoll.
 
 ## Code Layout
-- fileserver_iouring.c: File server using io_uring
-- fileserver_epoll.c: File server using epoll
-- fileserver.h: Shared definitions used by both servers
-- benchmarks: folder that contains all benchmarks used to test the performance of epoll and io_uring servers
-- evaluation: folder that contains figures and results of epoll and io_uring
-- visualizations: contains the code used to generate the figures and visualizations from the benchmark results
+- `fileserver_iouring.c`: File server using io_uring
+- `fileserver_epoll.c`: File server using epoll
+- `fileserver.h`: Shared definitions used by both servers
+- `benchmarks`: Contains all benchmarks used to test epoll and io_uring servers
+- `evaluation`: Contains figures and results of epoll and io_uring
+- `visualizations`: Code used to generate the figures and visualizations from the benchmark results
+
+**Additional Notes:**
+- There is also a folder `benchmarks/benchmark_cpu_tests` containing additional CPU-focused benchmarks. While these are not directly used in the main evaluation, results are available there.
 
 ## Requirements
 
@@ -144,7 +147,7 @@ The server will listen on the specified port and serve files from the current wo
 To run a benchmark, open another terminal and run the following:
 
 ```bash
-./benchmark_<Linx_kernel_interface>_<size>.sh
+./benchmark_<Linux_kernel_interface>_<size>.sh
 ```
 
 Example:
@@ -155,25 +158,60 @@ Example:
 
 ## Evaluation and Results
 
-At this stage, our evaluation focuses on the static file server using io_uring. These experiments are used to verify correctness and understand baseline performance before completing a direct comparison with the implementation using epoll.
+Our evaluation now includes both static file server implementations using **io_uring** and **epoll**, with performance measured across different file sizes and concurrency levels.
 
-### Functionality Verification
+Each benchmark figure contains four graphs:
 
-This figure shows results from basic functionality tests used to verify correct behavior of the io_uring file server under different request patterns.
+- **Top-left graph:** throughput as concurrent connections increase  
+- **Top-right graph:** latency as file size increases  
+- **Bottom-left graph:** CPU usage as concurrency increases  
+- **Bottom-right graph:** system calls used most often during testing (epoll only)
 
-![io_uring Function Verification](evaluation/io_uring_function_verify.png)
+The following subsections present results grouped by file size.
 
-### Performance and System Analysis
+### 1 KB File Benchmarks
 
-This figure shows how the io_uring file server performed during testing. The top left graph shows throughput as the number of concurrent connections increases. Performance improves at first, then drops once the load becomes too high. The top right graph shows latency for different file sizes. Smaller files are handled quickly, but latency increases as file size grows.
+![1KB Benchmark](evaluation/benchmark_comparison_1KB.png)
 
-The bottom left graph shows CPU usage steadily rising as more connections are added. The bottom right chart lists the system calls used most often during testing, with openat and mmap appearing the most, followed by others like fstat and close.
+- **Throughput:** At low concurrency, both io_uring and epoll perform similarly. As concurrency increases, epoll throughput drops sharply, while io_uring scales better and maintains higher throughput.  
+- **Latency:** Latency is low for both systems. io_uring generally maintains slightly lower latency than epoll.  
+- **CPU Utilization:** io_uring maintains stable CPU usage as concurrency increases. Epoll CPU usage drops under high load, indicating reduced efficiency.
 
-### Notes
+---
 
-A brief summary of the current evaluation results is available [here](https://github.com/NoahBeto/ecs251/blob/main/evaluation/io_uring_summary.txt)
+### 10 KB File Benchmarks
 
-The evaluation for epoll is currently in progress and will be added once testing is complete.
+![10KB Benchmark](evaluation/benchmark_comparison_10KB.png)
+
+- **Throughput:** io_uring continues to scale better at higher concurrency. Epoll throughput declines more noticeably under load.  
+- **Latency:** Latency increases slightly as file size grows. io_uring maintains similar or slightly lower latency than epoll.  
+- **CPU Utilization:** io_uring CPU usage remains steady, while epoll drops at high concurrency.
+
+---
+
+### 100 KB File Benchmarks
+
+![100KB Benchmark](evaluation/benchmark_comparison_100KB.png)
+
+- **Throughput:** io_uring maintains higher throughput than epoll under increasing concurrency, though the difference is less dramatic than for smaller files.  
+- **Latency:** Latency increases for both systems. For 100 KB files, io_uring latency grows slightly faster at the largest file sizes, likely because data transfer time dominates over syscall overhead.  
+- **CPU Utilization:** io_uring remains more efficient and maintains steadier CPU usage. Epoll CPU usage drops at high connection counts, showing less efficient handling of heavy load.
+
+---
+
+### System Call Comparison
+
+To provide a complete comparison of **syscall overhead**, we created `fileserver_iouring_wcount.c` to count `io_uring_submit()` calls. Using these counts and `strace` for epoll, we generated the following table:
+
+![System Call Comparison Table](evaluation/table_system_call_requests_epoll_iouring.png)
+
+**Context:**
+
+- Using `strace` while running 1000 requests at concurrency 100, epoll performs ~15 system calls per request across all file sizes.  
+- For io_uring, counting `io_uring_submit()` calls results in ~6 calls per request.  
+- **Explanation:** Epoll requires separate system calls for waiting, reading, and writing, while io_uring can submit multiple operations through shared ring buffers. This reduces syscall overhead and improves efficiency.
+
+All results now include **direct comparisons between epoll and io_uring**, demonstrating how io_uring reduces syscall overhead and improves performance for file-serving workloads.
 
 ## Frequent Problems
 - If a script does not have sufficient permissions to execute, run the following snippet to make it executable
@@ -181,7 +219,6 @@ The evaluation for epoll is currently in progress and will be added once testing
 chmod +x insert script name
 ``` 
 - The benchmarks are hardcoded to localhost:8000. Please run with 8000 until this is patched.
-
 
 ## Attribution
 
