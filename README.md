@@ -11,6 +11,25 @@ The original code comes from: https://github.com/chen622/uring-server
 
 That project focuses on comparing io_uring and epoll using an HTTP workload. This project builds on that work by adding a file server to look at how both approaches behave when file I/O becomes the main performance bottleneck.
 
+## Project Plan to Code Mapping
+
+The original project plan outlined three main goals:
+1. Compare io_uring and epoll performance for network I/O.
+2. Extend the evaluation to include file I/O workloads.
+3. Measure and visualize performance differences under varying concurrency and file sizes.
+
+We mapped these goals to the repository as follows:
+
+| Project Plan Goal                                | Repository Implementation                                                                 |
+|--------------------------------------------------|-------------------------------------------------------------------------------------------|
+| Compare io_uring and epoll for HTTP workloads   | HTTP server implementations (`http_server_iouring.c`, `http_server_epoll.c`) and benchmarks. |
+| Extend to file I/O workloads                    | File server implementations (`fileserver_iouring.c`, `fileserver_epoll.c`) and new benchmarks. |
+| Performance measurement and visualization       | Scripts in `benchmarks/` generate load; figures and visualizations stored in `evaluation/` and generated with `visualizations/`. |
+| Analyze system calls and CPU usage              | System call counting (`fileserver_iouring_wcount.c`) and included tables/graphs in evaluation. |
+| Large file benchmarks (1 MB & 10 MB)           | Raw images stored in `evaluation/`, referenced in README, with caution noted about accuracy. |
+
+This table explicitly links each component of the project plan to the code and results found in this repository.
+
 ## What Changed From the Original Project
 
 The original repository:
@@ -35,12 +54,24 @@ A file server shifts the focus toward:
 This makes it easier to observe where io_uring provides benefits over traditional designs using epoll.
 
 ## Code Layout
-- `fileserver_iouring.c`: File server using io_uring
-- `fileserver_epoll.c`: File server using epoll
-- `fileserver.h`: Shared definitions used by both servers
-- `benchmarks`: Contains all benchmarks used to test epoll and io_uring servers
-- `evaluation`: Contains figures and results of epoll and io_uring
-- `visualizations`: Code used to generate the figures and visualizations from the benchmark results
+
+- `fileserver_iouring.c` / `fileserver_epoll.c`  
+  Implement file servers using io_uring and epoll. These directly realize the file I/O workloads outlined in the project plan.
+
+- `fileserver.h`  
+  Shared definitions for both file servers to maintain consistent behavior and reduce code duplication.
+
+- `benchmarks/`  
+  Scripts for automated performance testing. Corresponds to the project plan’s requirement for reproducible performance evaluation.
+
+- `evaluation/`  
+  Stores the results of benchmarks, including throughput, latency, CPU usage, and system call counts. These files provide the quantitative evidence needed to support conclusions in the project plan.
+
+- `visualizations/`  
+  Python/Matplotlib scripts that generate figures from benchmark data. This connects the raw performance data to the visual analysis described in the project plan.
+
+- `benchmarks/benchmark_cpu_tests/`  
+  Extra benchmarks for CPU-intensive operations. These tests expand the evaluation beyond basic file/network I/O, addressing exploratory aspects of the project plan.
 
 **Additional Notes:**
 - There is also a folder `benchmarks/benchmark_cpu_tests` containing additional CPU-focused benchmarks. While these are not directly used in the main evaluation, results are available there.
